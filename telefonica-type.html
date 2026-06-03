@@ -8,21 +8,17 @@
 html,body{width:100%;height:100%;overflow:hidden}
 body{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;background:#f5f0ef}
 #c{display:block;position:fixed;top:0;left:0;width:100%;height:100%}
-
-#panel{
-  position:fixed;right:20px;top:50%;transform:translateY(-50%);
+#panel{position:fixed;right:20px;top:50%;transform:translateY(-50%);
   width:196px;display:flex;flex-direction:column;gap:11px;
   background:rgba(245,240,239,0.93);backdrop-filter:blur(16px);
   border:1px solid rgba(0,0,0,0.09);padding:16px;z-index:10;
-  max-height:96vh;overflow-y:auto;
-}
+  max-height:96vh;overflow-y:auto}
 #panel::-webkit-scrollbar{display:none}
 .lbl{font-size:7.5px;letter-spacing:.13em;text-transform:uppercase;
   color:rgba(0,0,0,.3);display:flex;justify-content:space-between;margin-bottom:4px}
 .lbl em{font-style:normal;color:rgba(0,0,0,.5);letter-spacing:0}
 .sec{display:flex;flex-direction:column;gap:9px}
 .div{height:1px;background:rgba(0,0,0,.07);flex-shrink:0}
-
 .arr-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
 .arr-btn{width:100%;height:34px;border:1px solid rgba(0,0,0,.12);background:transparent;
   cursor:pointer;display:flex;align-items:center;justify-content:center;
@@ -30,22 +26,18 @@ body{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;background:#f5f0ef}
 .arr-btn svg{width:16px;height:16px;display:block;flex-shrink:0;pointer-events:none}
 .arr-btn:hover{border-color:rgba(24,40,207,.45);color:#1828CF}
 .arr-btn.active{background:#1828CF;border-color:#1828CF;color:#fff}
-
 input[type=range]{-webkit-appearance:none;width:100%;height:1px;
   background:rgba(0,0,0,.18);outline:none;cursor:pointer;display:block}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:8px;height:8px;
   border-radius:50%;background:#1828CF;cursor:pointer}
-
 .row{display:flex;gap:4px}
 .btn{flex:1;height:24px;border:1px solid rgba(0,0,0,.12);background:transparent;
   font-size:7px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;
   font-family:inherit;color:rgba(0,0,0,.46);transition:all .1s;white-space:nowrap}
 .btn:hover,.btn.on{background:#1828CF;border-color:#1828CF;color:#fff}
-
 .bg-row{display:flex;gap:4px}
 .swatch{flex:1;height:18px;border:1px solid rgba(0,0,0,.12);cursor:pointer;transition:outline .1s}
 .swatch.on{outline:2px solid #1828CF;outline-offset:1px}
-
 #slist{max-height:68px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
 .si{display:flex;justify-content:space-between;align-items:center;
   font-size:8.5px;color:rgba(0,0,0,.44);padding:3px 0;
@@ -53,13 +45,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:8px;height
 .si:hover .sn{color:#1828CF}
 .si .sd{opacity:.22;font-size:11px;padding:0 2px;cursor:pointer}
 .si .sd:hover{opacity:1;color:red}
-
 .ab{width:100%;height:24px;border:1px solid rgba(0,0,0,.14);background:transparent;
   font-size:7.5px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;
   font-family:inherit;color:rgba(0,0,0,.44);transition:all .1s}
 .ab:hover{background:#1828CF;border-color:#1828CF;color:#fff}
 .ab.on{background:#1828CF;border-color:#1828CF;color:#fff}
-
 #hint{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);
   font-size:7.5px;letter-spacing:.12em;text-transform:uppercase;
   color:rgba(0,0,0,.18);pointer-events:none;white-space:nowrap}
@@ -105,7 +95,6 @@ body.on-dark #hint{color:rgba(255,255,255,.14)}
 </head>
 <body>
 <canvas id="c"></canvas>
-
 <div id="panel">
   <div class="sec">
     <div class="lbl">Arrangement</div>
@@ -121,18 +110,15 @@ body.on-dark #hint{color:rgba(255,255,255,.14)}
     <div id="gcrow" style="display:none"><div class="lbl">Columns <em id="v5">4</em></div><input type="range" id="r5" min="1" max="10" value="4"></div>
   </div>
   <div class="div"></div>
-  <!-- Path-specific toggles (circle, square perimeter) -->
   <div id="path-opts" style="display:none" class="sec">
-    <div class="row">
-      <button class="btn" id="btn-upright">Upright off</button>
-    </div>
+    <div class="row"><button class="btn" id="btn-upright">Upright off</button></div>
   </div>
   <div id="path-div" class="div" style="display:none"></div>
   <div class="sec">
-    <div class="lbl">Mode</div>
+    <div class="lbl">Motion</div>
     <div class="row">
       <button class="btn on" id="btn-tport">Travel</button>
-      <button class="btn" id="btn-axis">Horizontal</button>
+      <button class="btn" id="btn-axis">↻ 0°</button>
     </div>
   </div>
   <div class="div"></div>
@@ -147,6 +133,18 @@ body.on-dark #hint{color:rgba(255,255,255,.14)}
       <button class="btn" data-m="vortex">Spin</button>
       <button class="btn" data-m="gridsnap">Snap</button>
       <button class="btn" data-m="pin">Pin</button>
+    </div>
+  </div>
+  <div class="div"></div>
+  <div class="sec">
+    <div class="lbl">Alive</div>
+    <div class="row">
+      <button class="btn" id="btn-flow">Flow</button>
+      <button class="btn" id="btn-pulse">Pulse</button>
+    </div>
+    <div id="alive-speed-row">
+      <div class="lbl">Interval <em id="v6">3.0</em>s</div>
+      <input type="range" id="r6" min="5" max="60" value="30">
     </div>
   </div>
   <div class="div"></div>
@@ -177,44 +175,80 @@ body.on-dark #hint{color:rgba(255,255,255,.14)}
   <div class="div"></div>
   <button class="ab" id="bexport">Export PNG</button>
 </div>
-
 <div id="hint">Drag · Right-click pin · Space scatter · 1–8 keys · O order</div>
 
 <script>
 'use strict';
-
 const WORD='TELEFÓNICA', CH=WORD.split(''), N=CH.length;
 const BG_COLS={warm:'#f5f0ef',white:'#ffffff',blue:'#1828CF',dark:'#0d0d0d',clear:null};
 const FLASH={r:0,g:242,b:255};
 const BASE={warm:{r:24,g:40,b:207},white:{r:24,g:40,b:207},
             blue:{r:255,g:255,b:255},dark:{r:24,g:40,b:207},clear:{r:24,g:40,b:207}};
 
+// Optical kerning pairs — value = adjustment as fraction of fontSize
+// Negative = tighter, positive = looser. Applied progressively as spacing closes.
+const KERN={
+  'NI':-0.18,'IC':-0.14,'TI':-0.13,'LI':-0.11,'FI':-0.10,'EI':-0.10,
+  'ÓN':+0.06,'ON':+0.06,'CA':+0.05,'FÓ':-0.07,'LE':-0.04,'TE':-0.04,
+};
+
 let cv,cx,W,H;
-let letters=[], mx=0,my=0,mdown=false;
-let mode='free', bg='warm', arrKey='twoLine';
-let dragging=null, dox=0,doy=0;
+let letters=[],mx=0,my=0,mdown=false;
+let mode='free',bg='warm',arrKey='twoLine';
+let dragging=null,dox=0,doy=0;
 let conns=[];
 let scenes=[];
 let showLines=true;
-let pathUpright=false;   // upright text on circle/square-perimeter paths
-let teleportMode=false;  // jump to destination with flash
-let vertical=false;      // flip line-based layouts 90°
+let pathUpright=false;
+let teleportMode=false;
+let layoutRot=0;        // 0=0° 1=90° 2=180° 3=270°
+// Alive
+let flowMode=false,flowTimer=0;
+let pulseMode=false,pulseTimer=0;
+let aliveInterval=3.0;
 let P={sp:60,sz:80,spd:8,ten:6,rad:180,cols:4};
+try{scenes=JSON.parse(localStorage.getItem('tf5-scenes')||'[]');}catch(e){}
 
-try{scenes=JSON.parse(localStorage.getItem('tf4-scenes')||'[]');}catch(e){}
-
-// ── Easing: decisive accelerate → snap + micro-pop ─────────────
+// ── Easing ─────────────────────────────────────────────────────
 function ease(t){
-  if(t<=0)return 0; if(t>=1)return 1;
-  if(t<0.72){ const p=t/0.72; return 0.84*p*p; }
+  if(t<=0)return 0;if(t>=1)return 1;
+  if(t<0.72){const p=t/0.72;return 0.84*p*p;}
   const p=(t-0.72)/0.28;
-  return Math.min(1.015, 0.84+0.20*p + 0.022*Math.sin(p*Math.PI*3.5)*Math.pow(1-p,1.2));
+  return Math.min(1.015,0.84+0.20*p+0.022*Math.sin(p*Math.PI*3.5)*Math.pow(1-p,1.2));
+}
+
+// ── Optical kerning positions for a given char array ───────────
+// Returns centred x offsets with pair-kerning applied.
+// Kern effect scales 0→1 as spacing closes from 80px to 0px.
+function optPos(chars){
+  const baseW=P.sz*0.56;
+  const kScale=Math.max(0,1-P.sp/80);
+  const offs=[0];
+  let x=0;
+  for(let i=0;i<chars.length-1;i++){
+    const k=(KERN[chars[i]+chars[i+1]]||0)*P.sz*kScale;
+    x+=baseW+P.sp+k;
+    offs.push(x);
+  }
+  const total=offs[offs.length-1]+baseW;
+  return offs.map(o=>o-total/2+baseW/2);
+}
+
+// ── Global layout rotation (0°/90°/180°/270°) ──────────────────
+function rotateLayout(pos){
+  if(layoutRot===0)return pos;
+  const a=layoutRot*Math.PI/2;
+  const cos=Math.cos(a),sin=Math.sin(a);
+  return pos.map(p=>{
+    const dx=p.x-W/2,dy=p.y-H/2;
+    return{x:W/2+dx*cos-dy*sin,y:H/2+dx*sin+dy*cos,r:p.r+a};
+  });
 }
 
 // ── Letter ─────────────────────────────────────────────────────
 class Letter{
   constructor(char,idx){
-    this.ch=char; this.i=idx;
+    this.ch=char;this.i=idx;
     this.x=W*.5+(Math.random()-.5)*W*.5;
     this.y=H*.5+(Math.random()-.5)*H*.5;
     this.rot=0;
@@ -226,20 +260,19 @@ class Letter{
     this.ex=this.x;this.ey=this.y;
     this.delay=0;
     this.pulse=0;this.pw=0;
-    // teleport
-    this.tpThresh=0; this.tpDone=false;
+    this.tpThresh=2;this.tpDone=false;
+    // Breath phase — unique per letter so they don't all move together
+    this.bPhaseX=Math.random()*Math.PI*2;
+    this.bPhaseY=Math.random()*Math.PI*2;
   }
-
   goto(tx,ty,tr,delay){
     if(this.pinned)return;
     this.tx=tx;this.ty=ty;this.tr=tr||0;
-    this.settled=false; this.t=0; this.delay=delay||0;
+    this.settled=false;this.t=0;this.delay=delay||0;
     this.sx=this.x;this.sy=this.y;
     this.ex=tx;this.ey=ty;
     this.tpDone=false;
-    // teleport threshold: jump occurs at a random fraction 25–45% of the journey
     this.tpThresh=teleportMode?(0.25+Math.random()*0.2):2;
-    // small, consistent arc
     const dx=tx-this.x,dy=ty-this.y,d=Math.hypot(dx,dy)||1;
     const nx=-dy/d,ny=dx/d;
     const arc=Math.min(d*.12,30);
@@ -249,7 +282,6 @@ class Letter{
     this.cx2=this.sx+dx*.70+nx*arc*bias*.5;
     this.cy2=this.sy+dy*.70+ny*arc*bias*.5;
   }
-
   _bz(t){
     const m=1-t;
     return{
@@ -257,47 +289,40 @@ class Letter{
       y:m*m*m*this.sy+3*m*m*t*this.cy1+3*m*t*t*this.cy2+t*t*t*this.ey
     };
   }
-
   update(dt){
     if(this.pulse>0){this.pw+=dt*5.2;this.pulse=Math.max(0,this.pulse-dt*1.0);}
     if(this.pinned||this.settled)return;
     if(this.delay>0){this.delay-=dt;return;}
-
     const rate=(P.spd/10)*(0.32+P.ten/20*1.3);
     this.t=Math.min(1,this.t+dt*rate);
-
-    // ── Teleport jump ─────────────────────────────────────────
     if(!this.tpDone&&this.t>=this.tpThresh){
       this.tpDone=true;
       this.x=this.tx;this.y=this.ty;this.rot=this.tr;
-      this.t=1; this.settled=true;
-      // strong arrival flash — overshoot pulse for white-hot pop
+      this.t=1;this.settled=true;
       this.pulse=1.6;this.pw=0;
-      _prop(this,0,0.8,1);
-      return;
+      _prop(this,0,0.8,1);return;
     }
-
-    const et=Math.min(1,ease(this.t));
-    const p=this._bz(et);
+    const p=this._bz(Math.min(1,ease(this.t)));
     this.x=p.x;this.y=p.y;
     this.rot+=(this.tr-this.rot)*.14;
-
     if(this.t>=1){
       this.x=this.tx;this.y=this.ty;this.rot=this.tr;
       this.settled=true;this._settle();
     }
   }
-
   _settle(){this.pulse=1.0;this.pw=0;_prop(this,0,0.75,1);}
-
-  draw(){
-    const gv=Math.min(1.5, this.pulse*Math.max(0,Math.cos(this.pw*.4)));
+  draw(now){
+    const gv=Math.min(1.5,this.pulse*Math.max(0,Math.cos(this.pw*.4)));
     const base=BASE[bg]||BASE.warm;
     const r=Math.min(255,Math.max(0,Math.round(base.r+(FLASH.r-base.r)*gv)));
     const g=Math.min(255,Math.max(0,Math.round(base.g+(FLASH.g-base.g)*gv)));
     const b=Math.min(255,Math.max(0,Math.round(base.b+(FLASH.b-base.b)*gv)));
+    // Subtle breath — only when settled, very small (2px max)
+    const bAmp=this.settled?2:0;
+    const bx=Math.sin(now*0.33+this.bPhaseX)*bAmp;
+    const by=Math.cos(now*0.27+this.bPhaseY)*bAmp;
     cx.save();
-    cx.translate(this.x,this.y);
+    cx.translate(this.x+bx,this.y+by);
     cx.rotate(this.rot);
     cx.font=`700 ${P.sz}px "Helvetica Neue",Helvetica,Arial,sans-serif`;
     cx.fillStyle=`rgb(${r},${g},${b})`;
@@ -305,8 +330,7 @@ class Letter{
     cx.fillText(this.ch,0,0);
     if(this.pinned){
       cx.strokeStyle=bg==='blue'?'rgba(255,255,255,.3)':'rgba(24,40,207,.25)';
-      cx.lineWidth=.8;
-      const hw=P.sz*.38,hh=P.sz*.46;
+      cx.lineWidth=.8;const hw=P.sz*.38,hh=P.sz*.46;
       cx.strokeRect(-hw,-hh,hw*2,hh*2);
     }
     cx.restore();
@@ -327,40 +351,23 @@ function _prop(src,hop,amt,wBias){
   },88+k*52));
 }
 
+// Word-order pulse: ripples T→E→L→E→F→Ó→N→I→C→A with delay
+function wordPulse(){
+  letters.forEach((l,i)=>setTimeout(()=>{l.pulse=0.75;l.pw=0;},i*110));
+}
+
 // ── Helpers ────────────────────────────────────────────────────
 function cw(){return P.sz*.56+P.sp;}
 
-// Swap x↔y coords for vertical mode (rotates the whole layout 90°)
-function vert(pos){
-  if(!vertical)return pos;
-  const cx2=W/2,cy2=H/2;
-  return pos.map(p=>({
-    x: cx2-(p.y-cy2),
-    y: cy2+(p.x-cx2),
-    r: p.r+Math.PI/2
-  }));
-}
-
 // ── Square perimeter ───────────────────────────────────────────
-// Positions N letters evenly around the edge of a square.
 function squarePerimFn(){
-  const half=P.rad;          // half-side length
-  const side=half*2;
-  const perim=side*4;
-  const step=perim/N;
-  // Starting from top-left corner, going clockwise: top→right→bottom→left
+  const half=P.rad,side=half*2,perim=side*4,step=perim/N;
   return CH.map((_,i)=>{
-    let d=i*step+step*.5;    // centre each letter in its segment
-    let x,y,r;
-    if(d<side){              // top edge, left→right
-      x=W/2-half+d; y=H/2-half; r=pathUpright?0:0;
-    }else if(d<side*2){      // right edge, top→bottom
-      d-=side; x=W/2+half; y=H/2-half+d; r=pathUpright?0:Math.PI/2;
-    }else if(d<side*3){      // bottom edge, right→left
-      d-=side*2; x=W/2+half-d; y=H/2+half; r=pathUpright?0:Math.PI;
-    }else{                   // left edge, bottom→top
-      d-=side*3; x=W/2-half; y=H/2+half-d; r=pathUpright?0:-Math.PI/2;
-    }
+    let d=i*step,x,y,r;
+    if(d<side){x=W/2-half+d;y=H/2-half;r=pathUpright?0:0;}
+    else if(d<side*2){d-=side;x=W/2+half;y=H/2-half+d;r=pathUpright?0:Math.PI/2;}
+    else if(d<side*3){d-=side*2;x=W/2+half-d;y=H/2+half;r=pathUpright?0:Math.PI;}
+    else{d-=side*3;x=W/2-half;y=H/2+half-d;r=pathUpright?0:-Math.PI/2;}
     return{x,y,r};
   });
 }
@@ -371,11 +378,11 @@ const GRID_KEYS=new Set(['grid']);
 
 const ARR={
   line:{
-    tip:'Single line',
+    tip:'Single line — optical kerning applied',
     svg:'<svg viewBox="0 0 18 18" fill="none"><line x1="1" y1="9" x2="17" y2="9" stroke="currentColor" stroke-width="1.5"/></svg>',
     fn(){
-      const w=cw()*(N-1);
-      return vert(CH.map((_,i)=>({x:W/2-w/2+i*cw(),y:H/2,r:0})));
+      const xp=optPos(CH);
+      return rotateLayout(CH.map((_,i)=>({x:W/2+xp[i],y:H/2,r:0})));
     }
   },
   twoLine:{
@@ -383,9 +390,12 @@ const ARR={
     svg:'<svg viewBox="0 0 18 18" fill="none"><line x1="1" y1="7" x2="17" y2="7" stroke="currentColor" stroke-width="1.5"/><line x1="1" y1="13" x2="17" y2="13" stroke="currentColor" stroke-width="1.5"/></svg>',
     fn(){
       const sp=4,lh=P.sz*1.35;
-      return vert(CH.map((_,i)=>{
-        const row=i<sp?0:1,col=i<sp?i:i-sp,n=row===0?sp:N-sp;
-        return{x:W/2-(n-1)*cw()/2+col*cw(),y:H/2-lh/2+row*lh,r:0};
+      const r0=CH.slice(0,sp),r1=CH.slice(sp);
+      const xp0=optPos(r0),xp1=optPos(r1);
+      return rotateLayout(CH.map((_,i)=>{
+        const row=i<sp?0:1;
+        const xp=row===0?xp0[i]:xp1[i-sp];
+        return{x:W/2+xp,y:H/2-lh/2+row*lh,r:0};
       }));
     }
   },
@@ -394,10 +404,12 @@ const ARR={
     svg:'<svg viewBox="0 0 18 18" fill="none"><line x1="3" y1="5" x2="15" y2="5" stroke="currentColor" stroke-width="1.5"/><line x1="1" y1="10" x2="17" y2="10" stroke="currentColor" stroke-width="1.5"/><line x1="3" y1="15" x2="15" y2="15" stroke="currentColor" stroke-width="1.5"/></svg>',
     fn(){
       const segs=[[0,2],[2,6],[6,10]],lh=P.sz*1.32;
-      return vert(CH.map((_,i)=>{
+      const rows=segs.map(([s,e])=>CH.slice(s,e));
+      const xps=rows.map(r=>optPos(r));
+      return rotateLayout(CH.map((_,i)=>{
         const ri=segs.findIndex(([s,e])=>i>=s&&i<e);
-        const[s]=segs[ri],col=i-s,n=segs[ri][1]-segs[ri][0];
-        return{x:W/2-(n-1)*cw()/2+col*cw(),y:H/2-lh+ri*lh,r:0};
+        const[s]=segs[ri];
+        return{x:W/2+xps[ri][i-s],y:H/2-lh+ri*lh,r:0};
       }));
     }
   },
@@ -406,16 +418,19 @@ const ARR={
     svg:'<svg viewBox="0 0 18 18" fill="none"><circle cx="3" cy="6" r="1.4" fill="currentColor"/><circle cx="9" cy="6" r="1.4" fill="currentColor"/><circle cx="15" cy="6" r="1.4" fill="currentColor"/><circle cx="3" cy="13" r="1.4" fill="currentColor"/><circle cx="9" cy="13" r="1.4" fill="currentColor"/><circle cx="15" cy="13" r="1.4" fill="currentColor"/></svg>',
     fn(){
       const cols=Math.max(1,P.cols),ch=P.sz*1.45,rows=Math.ceil(N/cols);
-      return vert(CH.map((_,i)=>({
-        x:W/2-(cols-1)*cw()/2+(i%cols)*cw(),
-        y:H/2-(rows-1)*ch/2+Math.floor(i/cols)*ch,r:0
-      })));
+      // Per-row optical kerning
+      return rotateLayout(CH.map((_,i)=>{
+        const row=Math.floor(i/cols),col=i%cols;
+        const rowChars=CH.slice(row*cols,Math.min((row+1)*cols,N));
+        const xp=optPos(rowChars);
+        return{x:W/2+(xp[col]||0),y:H/2-(rows-1)*ch/2+row*ch,r:0};
+      }));
     }
   },
   squarePerim:{
     tip:'Square perimeter — letters run around the edge',
     svg:'<svg viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="14" height="14" stroke="currentColor" stroke-width="1.2"/><circle cx="2" cy="2" r="1.2" fill="currentColor"/><circle cx="16" cy="2" r="1.2" fill="currentColor"/><circle cx="16" cy="16" r="1.2" fill="currentColor"/><circle cx="2" cy="16" r="1.2" fill="currentColor"/></svg>',
-    fn(){ return squarePerimFn(); }
+    fn(){return squarePerimFn();}
   },
   circle:{
     tip:'Single circle',
@@ -433,10 +448,7 @@ const ARR={
     fn(){
       const inner=4,r1=P.rad,r2=P.rad*.46;
       return CH.map((_,i)=>{
-        if(i<N-inner){
-          const a=(i/(N-inner))*Math.PI*2-Math.PI/2;
-          return{x:W/2+Math.cos(a)*r1,y:H/2+Math.sin(a)*r1,r:pathUpright?0:a+Math.PI/2};
-        }
+        if(i<N-inner){const a=(i/(N-inner))*Math.PI*2-Math.PI/2;return{x:W/2+Math.cos(a)*r1,y:H/2+Math.sin(a)*r1,r:pathUpright?0:a+Math.PI/2};}
         const j=i-(N-inner),a=(j/inner)*Math.PI*2-Math.PI/2;
         return{x:W/2+Math.cos(a)*r2,y:H/2+Math.sin(a)*r2,r:pathUpright?0:a+Math.PI/2};
       });
@@ -455,25 +467,23 @@ const ARR={
   }
 };
 
-// ── Apply ───────────────────────────────────────────────────────
+// ── Apply arrangement ──────────────────────────────────────────
 function apply(key){
   arrKey=key;
-  const a=ARR[key]; if(!a)return;
+  const a=ARR[key];if(!a)return;
   const pos=a.fn();
-  const isPath=PATH_KEYS.has(key), isGrid=GRID_KEYS.has(key);
+  const isPath=PATH_KEYS.has(key),isGrid=GRID_KEYS.has(key);
   document.getElementById('rrow').style.display   =isPath?'':'none';
   document.getElementById('gcrow').style.display  =isGrid?'':'none';
-  document.getElementById('path-opts').style.display =isPath?'':'none';
-  document.getElementById('path-div').style.display  =isPath?'':'none';
+  document.getElementById('path-opts').style.display=isPath?'':'none';
+  document.getElementById('path-div').style.display =isPath?'':'none';
   letters.forEach((l,i)=>l.goto(pos[i].x,pos[i].y,pos[i].r,i*.038+Math.random()*.018));
   document.querySelectorAll('.arr-btn').forEach(b=>b.classList.toggle('active',b.dataset.key===key));
 }
 
 function scatter(){
   const m=P.sz*1.4;
-  letters.forEach((l,i)=>{
-    if(!l.pinned)l.goto(m+Math.random()*(W-m*2),m+Math.random()*(H-m*2),0,i*.025);
-  });
+  letters.forEach((l,i)=>{if(!l.pinned)l.goto(m+Math.random()*(W-m*2),m+Math.random()*(H-m*2),0,i*.025);});
   document.querySelectorAll('.arr-btn').forEach(b=>b.classList.remove('active'));
 }
 
@@ -484,14 +494,19 @@ function findOrder(){
   letters.forEach((l,i)=>{if(!l.pinned)l.goto(pts[i].x,pts[i].y,pts[i].r,i*.055);});
 }
 
+// ── Flow: randomly sequences arrangements ──────────────────────
+function flowStep(){
+  const keys=Object.keys(ARR).filter(k=>k!==arrKey);
+  apply(keys[Math.floor(Math.random()*keys.length)]);
+}
+
 // ── Mouse forces ───────────────────────────────────────────────
 function forces(){
   if(!mdown)return;
   letters.forEach(l=>{
     if(l.pinned)return;
     const dx=l.x-mx,dy=l.y-my,d=Math.hypot(dx,dy)||1;
-    const inf=Math.max(0,1-d/210);
-    if(inf<.001)return;
+    const inf=Math.max(0,1-d/210);if(inf<.001)return;
     if(mode==='attract'){l.x-=dx/d*inf*3;l.y-=dy/d*inf*3;l.settled=false;l.tx=l.x;l.ty=l.y;}
     else if(mode==='repel'){l.x+=dx/d*inf*3.5;l.y+=dy/d*inf*3.5;l.settled=false;l.tx=l.x;l.ty=l.y;}
     else if(mode==='vortex'){l.x+=(-dy/d)*inf*3;l.y+=(dx/d)*inf*3;l.settled=false;l.tx=l.x;l.ty=l.y;}
@@ -499,51 +514,48 @@ function forces(){
 }
 
 // ── Render ─────────────────────────────────────────────────────
+let gNow=0;
 function render(){
   const bgc=BG_COLS[bg];
   if(bgc){cx.fillStyle=bgc;cx.fillRect(0,0,W,H);}else cx.clearRect(0,0,W,H);
   if(showLines){
     const lc=bg==='blue'?'120,210,255':bg==='dark'?'80,130,255':'0,242,255';
     conns=conns.filter(c=>c.life>0);
-    conns.forEach(c=>{
-      c.life-=.022;
-      cx.strokeStyle=`rgba(${lc},${Math.max(0,c.life)*.32})`;
-      cx.lineWidth=.7;cx.beginPath();cx.moveTo(c.x1,c.y1);cx.lineTo(c.x2,c.y2);cx.stroke();
-    });
+    conns.forEach(c=>{c.life-=.022;cx.strokeStyle=`rgba(${lc},${Math.max(0,c.life)*.32})`;cx.lineWidth=.7;cx.beginPath();cx.moveTo(c.x1,c.y1);cx.lineTo(c.x2,c.y2);cx.stroke();});
   }
   if(mode==='gridsnap'){
-    const g=cw();
-    cx.fillStyle=bg==='blue'?'rgba(255,255,255,.04)':'rgba(0,242,255,.07)';
-    for(let x=g/2;x<W;x+=g)for(let y=g/2;y<H;y+=g){
-      cx.beginPath();cx.arc(x,y,1.2,0,Math.PI*2);cx.fill();
-    }
+    const g=cw();cx.fillStyle=bg==='blue'?'rgba(255,255,255,.04)':'rgba(0,242,255,.07)';
+    for(let x=g/2;x<W;x+=g)for(let y=g/2;y<H;y+=g){cx.beginPath();cx.arc(x,y,1.2,0,Math.PI*2);cx.fill();}
   }
-  letters.forEach(l=>l.draw());
+  letters.forEach(l=>l.draw(gNow));
 }
 
 // ── Loop ───────────────────────────────────────────────────────
 let last=0;
 function loop(ts){
   const dt=Math.min((ts-last)/1000,.05);last=ts;
+  gNow=ts/1000; // seconds, for breath
   letters.forEach(l=>l.update(dt));
-  forces();render();
+  forces();
+  if(flowMode){flowTimer+=dt;if(flowTimer>=aliveInterval){flowTimer=0;flowStep();}}
+  if(pulseMode){pulseTimer+=dt;if(pulseTimer>=aliveInterval){pulseTimer=0;wordPulse();}}
+  render();
   requestAnimationFrame(loop);
 }
 
 // ── Scenes ─────────────────────────────────────────────────────
 function saveScene(){
   const name=prompt('Name:',`Scene ${scenes.length+1}`);if(!name)return;
-  scenes.push({id:Date.now(),name,key:arrKey,bg,p:{...P},vertical,
+  scenes.push({id:Date.now(),name,key:arrKey,bg,p:{...P},rot:layoutRot,
     pos:letters.map(l=>({x:l.x,y:l.y,r:l.rot,pin:l.pinned}))});
-  try{localStorage.setItem('tf4-scenes',JSON.stringify(scenes));}catch(e){}
+  try{localStorage.setItem('tf5-scenes',JSON.stringify(scenes));}catch(e){}
   renderScenes();
 }
 function loadScene(s){
-  arrKey=s.key;bg=s.bg;Object.assign(P,s.p);vertical=!!s.vertical;
-  syncSliders();setBg(s.bg);
+  arrKey=s.key;bg=s.bg;Object.assign(P,s.p);layoutRot=s.rot||0;
+  syncSliders();setBg(s.bg);updateRotBtn();
   s.pos.forEach((p,i)=>{if(letters[i]){letters[i].pinned=p.pin;letters[i].goto(p.x,p.y,p.r,i*.04);}});
   document.querySelectorAll('.arr-btn').forEach(b=>b.classList.toggle('active',b.dataset.key===s.key));
-  updateAxisBtn();
 }
 function renderScenes(){
   const el=document.getElementById('slist');el.innerHTML='';
@@ -553,36 +565,30 @@ function renderScenes(){
     row.querySelector('.sn').onclick=()=>loadScene(s);
     row.querySelector('.sd').onclick=e=>{
       e.stopPropagation();scenes=scenes.filter(x=>x.id!==s.id);
-      try{localStorage.setItem('tf4-scenes',JSON.stringify(scenes));}catch(e){}
+      try{localStorage.setItem('tf5-scenes',JSON.stringify(scenes));}catch(e){}
       renderScenes();
     };
     el.appendChild(row);
   });
 }
-
 function setBg(key){
   bg=key;
   document.body.className=key==='blue'?'on-blue':key==='dark'?'on-dark':'';
-  document.body.style.background=key==='clear'
-    ?'repeating-conic-gradient(#bbb 0% 25%,#ddd 0% 50%) 0 0/14px 14px':'';
+  document.body.style.background=key==='clear'?'repeating-conic-gradient(#bbb 0% 25%,#ddd 0% 50%) 0 0/14px 14px':'';
 }
 function syncSliders(){
-  [['r0','v0','sp'],['r1','v1','sz'],['r2','v2','spd'],['r3','v3','ten'],
-   ['r4','v4','rad'],['r5','v5','cols']].forEach(([r,v,k])=>{
-    document.getElementById(r).value=P[k];
-    document.getElementById(v).textContent=P[k];
+  [['r0','v0','sp'],['r1','v1','sz'],['r2','v2','spd'],['r3','v3','ten'],['r4','v4','rad'],['r5','v5','cols']].forEach(([r,v,k])=>{
+    document.getElementById(r).value=P[k];document.getElementById(v).textContent=P[k];
   });
 }
-function updateAxisBtn(){
-  const b=document.getElementById('btn-axis');
-  b.textContent=vertical?'Vertical':'Horizontal';
-  b.classList.toggle('on',vertical);
+function updateRotBtn(){
+  const degs=[0,90,180,270];
+  document.getElementById('btn-axis').textContent=`↻ ${degs[layoutRot]}°`;
 }
 function resize(){W=cv.width=window.innerWidth;H=cv.height=window.innerHeight;}
 function letterAt(x,y){
   const r=P.sz*.54;
-  for(let k=letters.length-1;k>=0;k--)
-    if(Math.hypot(letters[k].x-x,letters[k].y-y)<r)return letters[k];
+  for(let k=letters.length-1;k>=0;k--)if(Math.hypot(letters[k].x-x,letters[k].y-y)<r)return letters[k];
   return null;
 }
 
@@ -591,7 +597,6 @@ window.addEventListener('load',()=>{
   cv=document.getElementById('c');cx=cv.getContext('2d');
   resize();
   window.addEventListener('resize',()=>{resize();apply(arrKey);});
-
   letters=CH.map((c,i)=>new Letter(c,i));
 
   // Arrangement buttons
@@ -604,48 +609,42 @@ window.addEventListener('load',()=>{
   });
 
   // Sliders
-  [['r0','v0','sp'],['r1','v1','sz'],['r2','v2','spd'],['r3','v3','ten'],
-   ['r4','v4','rad'],['r5','v5','cols']].forEach(([rid,vid,pk])=>{
+  [['r0','v0','sp'],['r1','v1','sz'],['r2','v2','spd'],['r3','v3','ten'],['r4','v4','rad'],['r5','v5','cols']].forEach(([rid,vid,pk])=>{
     document.getElementById(rid).addEventListener('input',e=>{
-      P[pk]=+e.target.value;
-      document.getElementById(vid).textContent=P[pk];
+      P[pk]=+e.target.value;document.getElementById(vid).textContent=P[pk];
       if(['sp','sz','rad','cols'].includes(pk))apply(arrKey);
     });
+  });
+  document.getElementById('r6').addEventListener('input',e=>{
+    aliveInterval=+e.target.value/10;
+    document.getElementById('v6').textContent=aliveInterval.toFixed(1);
   });
 
   // Mouse modes
   document.querySelectorAll('[data-m]').forEach(b=>{
-    b.addEventListener('click',()=>{
-      mode=b.dataset.m;
-      document.querySelectorAll('[data-m]').forEach(x=>x.classList.remove('on'));
-      b.classList.add('on');
-    });
+    b.addEventListener('click',()=>{mode=b.dataset.m;document.querySelectorAll('[data-m]').forEach(x=>x.classList.remove('on'));b.classList.add('on');});
   });
 
-  // BG swatches
+  // BG
   document.querySelectorAll('[data-bg]').forEach(s=>{
-    s.addEventListener('click',()=>{
-      setBg(s.dataset.bg);
-      document.querySelectorAll('[data-bg]').forEach(x=>x.classList.remove('on'));
-      s.classList.add('on');
-    });
+    s.addEventListener('click',()=>{setBg(s.dataset.bg);document.querySelectorAll('[data-bg]').forEach(x=>x.classList.remove('on'));s.classList.add('on');});
   });
 
-  // Teleport toggle
+  // Teleport
   document.getElementById('btn-tport').addEventListener('click',e=>{
     teleportMode=!teleportMode;
     e.target.textContent=teleportMode?'Teleport':'Travel';
     e.target.classList.toggle('on',!teleportMode);
   });
 
-  // Vertical / horizontal axis toggle
-  document.getElementById('btn-axis').addEventListener('click',e=>{
-    vertical=!vertical;
-    updateAxisBtn();
+  // Layout rotation — cycles 0°→90°→180°→270°→0°
+  document.getElementById('btn-axis').addEventListener('click',()=>{
+    layoutRot=(layoutRot+1)%4;
+    updateRotBtn();
     apply(arrKey);
   });
 
-  // Upright toggle (path arrangements)
+  // Upright (path arrangements)
   document.getElementById('btn-upright').addEventListener('click',e=>{
     pathUpright=!pathUpright;
     e.target.textContent=pathUpright?'Upright on':'Upright off';
@@ -653,12 +652,24 @@ window.addEventListener('load',()=>{
     apply(arrKey);
   });
 
+  // Alive
+  document.getElementById('btn-flow').addEventListener('click',e=>{
+    flowMode=!flowMode;flowTimer=0;
+    e.target.classList.toggle('on',flowMode);
+    e.target.textContent=flowMode?'Flow on':'Flow';
+    if(pulseMode){pulseMode=false;document.getElementById('btn-pulse').classList.remove('on');document.getElementById('btn-pulse').textContent='Pulse';}
+  });
+  document.getElementById('btn-pulse').addEventListener('click',e=>{
+    pulseMode=!pulseMode;pulseTimer=0;
+    e.target.classList.toggle('on',pulseMode);
+    e.target.textContent=pulseMode?'Pulse on':'Pulse';
+    if(flowMode){flowMode=false;document.getElementById('btn-flow').classList.remove('on');document.getElementById('btn-flow').textContent='Flow';}
+  });
+
   // Lines
   document.getElementById('btn-lines').addEventListener('click',e=>{
-    showLines=!showLines;
-    e.target.textContent=showLines?'Lines on':'Lines off';
-    e.target.classList.toggle('on',showLines);
-    if(!showLines)conns=[];
+    showLines=!showLines;e.target.textContent=showLines?'Lines on':'Lines off';
+    e.target.classList.toggle('on',showLines);if(!showLines)conns=[];
   });
 
   // Find order
@@ -667,8 +678,7 @@ window.addEventListener('load',()=>{
   // Scenes / export
   document.getElementById('bsave').addEventListener('click',saveScene);
   document.getElementById('bexport').addEventListener('click',()=>{
-    render();
-    const a=document.createElement('a');
+    render();const a=document.createElement('a');
     a.download='telefonica-'+Date.now()+'.png';
     a.href=cv.toDataURL('image/png');a.click();
   });
@@ -680,10 +690,7 @@ window.addEventListener('load',()=>{
     if(mode==='pin'){if(hit)hit.pinned=!hit.pinned;return;}
     if(mode==='free'&&hit){dragging=hit;dox=hit.x-mx;doy=hit.y-my;}
   });
-  cv.addEventListener('mousemove',e=>{
-    mx=e.clientX;my=e.clientY;
-    if(dragging){dragging.x=mx+dox;dragging.y=my+doy;}
-  });
+  cv.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;if(dragging){dragging.x=mx+dox;dragging.y=my+doy;}});
   cv.addEventListener('mouseup',()=>{
     mdown=false;
     if(dragging){
@@ -692,9 +699,7 @@ window.addEventListener('load',()=>{
         l.tx=l.x;l.ty=l.y;l.settled=true;l.pulse=.85;l.pw=0;_prop(l,0,.6,1);
         const pos=ARR[arrKey]?.fn();
         if(pos){let pi=0;letters.forEach(x=>{if(x===l||x.pinned)return;if(pos[pi])x.goto(pos[pi].x,pos[pi].y,pos[pi].r,pi*.04+.08);pi++;});}
-      }else if(mode==='gridsnap'){
-        const g=cw();l.goto(Math.round(l.x/g)*g,Math.round(l.y/g)*g,0,0);
-      }
+      }else if(mode==='gridsnap'){const g=cw();l.goto(Math.round(l.x/g)*g,Math.round(l.y/g)*g,0,0);}
     }
     if(mode==='repel'||mode==='attract')setTimeout(()=>apply(arrKey),280);
   });
@@ -710,7 +715,7 @@ window.addEventListener('load',()=>{
     if(e.code==='Space'){e.preventDefault();scatter();}
     if(e.code==='Enter')apply(arrKey);
     if(e.code==='KeyO')findOrder();
-    if(e.code==='KeyV'){vertical=!vertical;updateAxisBtn();apply(arrKey);}
+    if(e.code==='KeyR'){layoutRot=(layoutRot+1)%4;updateRotBtn();apply(arrKey);}
     if(e.code==='KeyT'){teleportMode=!teleportMode;const b=document.getElementById('btn-tport');b.textContent=teleportMode?'Teleport':'Travel';b.classList.toggle('on',!teleportMode);}
     const keys=Object.keys(ARR);
     if(e.key>='1'&&e.key<='8')apply(keys[+e.key-1]||arrKey);
