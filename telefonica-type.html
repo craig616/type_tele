@@ -600,6 +600,13 @@ function flowStep(){
     P.sz=Math.round(48+Math.random()*88);
     setSlider('r1','v1',P.sz);
   }
+  // Upright toggles every 7 cycles — long-term feel change
+  if(flowCycleCount%7===0){
+    pathUpright=Math.random()>0.5;
+    const bu=document.getElementById('btn-upright');
+    bu.textContent=pathUpright?'Upright on':'Upright off';
+    bu.classList.toggle('on',pathUpright);
+  }
   // Randomly toggle justify — only meaningful for multi-line arrangements
   justify=Math.random()>0.5;
   document.getElementById('btn-justify').textContent=justify?'Justified':'Justify';
