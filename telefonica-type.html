@@ -215,8 +215,6 @@ let flowMode=false,flowTimer=0;
 let pulseMode=false,pulseTimer=0;
 let aliveInterval=3.0;
 let flowCycleCount=0;
-let lastInteract=0;      // gNow seconds at last user touch
-let autoFlowFired=false; // idle auto-flow triggers once per session
 let P={sp:60,sz:80,spd:8,ten:6,rad:180,cols:4,stagger:0};
 try{scenes=JSON.parse(localStorage.getItem('tf6-scenes')||'[]');}catch(e){}
 
@@ -587,30 +585,52 @@ function setSlider(id,vid,val){
 }
 function flowStep(){
   flowCycleCount++;
-  // Tension varies every cycle — controls the snap feel
+  // Every cycle: tension + spacing + justify
   P.ten=Math.round(3+Math.random()*14);
   setSlider('r3','v3',P.ten);
-  // Speed varies every 2 cycles
+  P.sp=Math.round(Math.random()*120);
+  setSlider('r0','v0',P.sp);
+  justify=Math.random()>0.5;
+  document.getElementById('btn-justify').textContent=justify?'Justified':'Justify';
+  document.getElementById('btn-justify').classList.toggle('on',justify);
+  // Every 2 cycles: speed + stagger
   if(flowCycleCount%2===0){
     P.spd=Math.round(4+Math.random()*13);
     setSlider('r2','v2',P.spd);
+    P.stagger=Math.round((Math.random()*2-1)*180);
+    setSlider('rs','vs',P.stagger);
   }
-  // Size varies every 5 cycles — stays consistent for several arrangements
+  // Every 3 cycles: radius + columns
+  if(flowCycleCount%3===0){
+    P.rad=Math.round(80+Math.random()*320);
+    setSlider('r4','v4',P.rad);
+    P.cols=Math.round(2+Math.random()*6);
+    setSlider('r5','v5',P.cols);
+  }
+  // Every 4 cycles: stagger alt mode
+  if(flowCycleCount%4===0){
+    staggerAlt=Math.random()>0.5;
+    const bs=document.getElementById('btn-stagger-alt');
+    bs.textContent=staggerAlt?'Alt on':'Alt stagger';
+    bs.classList.toggle('on',staggerAlt);
+  }
+  // Every 5 cycles: size
   if(flowCycleCount%5===0){
     P.sz=Math.round(48+Math.random()*88);
     setSlider('r1','v1',P.sz);
   }
-  // Upright toggles every 7 cycles — long-term feel change
+  // Every 6 cycles: layout rotation
+  if(flowCycleCount%6===0){
+    layoutRot=Math.floor(Math.random()*4);
+    updateRotBtn();
+  }
+  // Every 7 cycles: upright
   if(flowCycleCount%7===0){
     pathUpright=Math.random()>0.5;
     const bu=document.getElementById('btn-upright');
     bu.textContent=pathUpright?'Upright on':'Upright off';
     bu.classList.toggle('on',pathUpright);
   }
-  // Randomly toggle justify — only meaningful for multi-line arrangements
-  justify=Math.random()>0.5;
-  document.getElementById('btn-justify').textContent=justify?'Justified':'Justify';
-  document.getElementById('btn-justify').classList.toggle('on',justify);
   // Pick and apply a random different arrangement
   const keys=Object.keys(ARR).filter(k=>k!==arrKey);
   apply(keys[Math.floor(Math.random()*keys.length)]);
@@ -652,17 +672,7 @@ function loop(ts){
   const dt=Math.min((ts-last)/1000,.05);last=ts;gNow=ts/1000;
   letters.forEach(l=>l.update(dt));
   forces();
-  // Idle auto-flow: triggers once after 10s of no interaction
-  if(!autoFlowFired&&!flowMode&&gNow-lastInteract>=10){
-    autoFlowFired=true;
-    teleportMode=true; aliveInterval=3.5; flowMode=true; flowTimer=0; flowCycleCount=0;
-    document.getElementById('btn-tport').textContent='Teleport';
-    document.getElementById('btn-tport').classList.remove('on');
-    document.getElementById('btn-flow').textContent='Flow on';
-    document.getElementById('btn-flow').classList.add('on');
-    document.getElementById('r6').value=22; document.getElementById('v6').textContent='2.2';
-  }
-  if(flowMode){flowTimer+=dt;if(flowTimer>=aliveInterval){flowTimer=0;flowStep();}}
+if(flowMode){flowTimer+=dt;if(flowTimer>=aliveInterval){flowTimer=0;flowStep();}}
   if(pulseMode){pulseTimer+=dt;if(pulseTimer>=aliveInterval){pulseTimer=0;wordPulse();}}
   render();
   requestAnimationFrame(loop);
@@ -816,17 +826,8 @@ window.addEventListener('load',()=>{
   });
 
   // Mouse
-  function onInteract(){
-    lastInteract=gNow;
-    if(autoFlowFired&&flowMode){
-      flowMode=false;
-      document.getElementById('btn-flow').textContent='Flow';
-      document.getElementById('btn-flow').classList.remove('on');
-    }
-  }
-
   cv.addEventListener('mousedown',e=>{
-    mx=e.clientX;my=e.clientY;mdown=true;onInteract();
+    mx=e.clientX;my=e.clientY;mdown=true;
     const hit=letterAt(mx,my);
     if(mode==='pin'){if(hit)hit.pinned=!hit.pinned;return;}
     if(mode==='free'&&hit){dragging=hit;dox=hit.x-mx;doy=hit.y-my;}
@@ -846,12 +847,11 @@ window.addEventListener('load',()=>{
   });
   cv.addEventListener('contextmenu',e=>{e.preventDefault();const hit=letterAt(e.clientX,e.clientY);if(hit)hit.pinned=!hit.pinned;});
 
-  cv.addEventListener('touchstart',e=>{e.preventDefault();const t=e.touches[0];mx=t.clientX;my=t.clientY;mdown=true;onInteract();const hit=letterAt(mx,my);if(hit&&mode==='free'){dragging=hit;dox=hit.x-mx;doy=hit.y-my;}},{passive:false});
+  cv.addEventListener('touchstart',e=>{e.preventDefault();const t=e.touches[0];mx=t.clientX;my=t.clientY;mdown=true;const hit=letterAt(mx,my);if(hit&&mode==='free'){dragging=hit;dox=hit.x-mx;doy=hit.y-my;}},{passive:false});
   cv.addEventListener('touchmove',e=>{e.preventDefault();const t=e.touches[0];mx=t.clientX;my=t.clientY;if(dragging){dragging.x=mx+dox;dragging.y=my+doy;}},{passive:false});
   cv.addEventListener('touchend',()=>{mdown=false;if(dragging){const l=dragging;dragging=null;l.tx=l.x;l.ty=l.y;l.settled=true;}});
 
   window.addEventListener('keydown',e=>{
-    onInteract();
     if(e.code==='Space'){e.preventDefault();scatter();}
     if(e.code==='Enter')apply(arrKey);
     if(e.code==='KeyO')findOrder();
