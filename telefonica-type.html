@@ -38,7 +38,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:8px;height
 .bg-row{display:flex;gap:4px}
 .swatch{flex:1;height:18px;border:1px solid rgba(0,0,0,.12);cursor:pointer;transition:outline .1s}
 .swatch.on{outline:2px solid #1828CF;outline-offset:1px}
-#slist{max-height:68px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
+#slist{max-height:64px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
 .si{display:flex;justify-content:space-between;align-items:center;
   font-size:8.5px;color:rgba(0,0,0,.44);padding:3px 0;
   border-bottom:1px solid rgba(0,0,0,.05);cursor:pointer}
@@ -54,7 +54,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:8px;height
   font-size:7.5px;letter-spacing:.12em;text-transform:uppercase;
   color:rgba(0,0,0,.18);pointer-events:none;white-space:nowrap}
 
-/* Blue panel */
 body.on-blue #panel{background:rgba(8,18,155,.9);border-color:rgba(255,255,255,.12)}
 body.on-blue .lbl{color:rgba(255,255,255,.32)} body.on-blue .lbl em{color:rgba(255,255,255,.52)}
 body.on-blue .arr-btn{border-color:rgba(255,255,255,.18);color:rgba(255,255,255,.32)}
@@ -72,8 +71,6 @@ body.on-blue .div{background:rgba(255,255,255,.08)}
 body.on-blue .si{color:rgba(255,255,255,.4);border-color:rgba(255,255,255,.07)}
 body.on-blue .si:hover .sn{color:#fff}
 body.on-blue #hint{color:rgba(255,255,255,.16)}
-
-/* Dark panel */
 body.on-dark #panel{background:rgba(10,10,10,.9);border-color:rgba(255,255,255,.1)}
 body.on-dark .lbl{color:rgba(255,255,255,.28)} body.on-dark .lbl em{color:rgba(255,255,255,.48)}
 body.on-dark .arr-btn{border-color:rgba(255,255,255,.14);color:rgba(255,255,255,.28)}
@@ -110,6 +107,17 @@ body.on-dark #hint{color:rgba(255,255,255,.14)}
     <div id="gcrow" style="display:none"><div class="lbl">Columns <em id="v5">4</em></div><input type="range" id="r5" min="1" max="10" value="4"></div>
   </div>
   <div class="div"></div>
+  <!-- Multi-line controls: justify + stagger -->
+  <div id="ml-opts" style="display:none" class="sec">
+    <div class="lbl">Line layout</div>
+    <div class="row">
+      <button class="btn" id="btn-justify">Justify</button>
+      <button class="btn" id="btn-stagger-alt">Alt stagger</button>
+    </div>
+    <div><div class="lbl">Stagger <em id="vs">0</em>px</div><input type="range" id="rs" min="-300" max="300" value="0"></div>
+  </div>
+  <div id="ml-div" class="div" style="display:none"></div>
+  <!-- Path controls -->
   <div id="path-opts" style="display:none" class="sec">
     <div class="row"><button class="btn" id="btn-upright">Upright off</button></div>
   </div>
@@ -118,6 +126,7 @@ body.on-dark #hint{color:rgba(255,255,255,.14)}
     <div class="lbl">Motion</div>
     <div class="row">
       <button class="btn on" id="btn-tport">Travel</button>
+      <button class="btn" id="btn-readable">Readable</button>
       <button class="btn" id="btn-axis">↻ 0°</button>
     </div>
   </div>
@@ -142,10 +151,7 @@ body.on-dark #hint{color:rgba(255,255,255,.14)}
       <button class="btn" id="btn-flow">Flow</button>
       <button class="btn" id="btn-pulse">Pulse</button>
     </div>
-    <div id="alive-speed-row">
-      <div class="lbl">Interval <em id="v6">3.0</em>s</div>
-      <input type="range" id="r6" min="5" max="60" value="30">
-    </div>
+    <div><div class="lbl">Interval <em id="v6">3.0</em>s</div><input type="range" id="r6" min="5" max="60" value="30"></div>
   </div>
   <div class="div"></div>
   <div class="sec">
@@ -175,7 +181,7 @@ body.on-dark #hint{color:rgba(255,255,255,.14)}
   <div class="div"></div>
   <button class="ab" id="bexport">Export PNG</button>
 </div>
-<div id="hint">Drag · Right-click pin · Space scatter · 1–8 keys · O order</div>
+<div id="hint">Drag · Right-click pin · Space scatter · 1–8 keys · O order · R rotate</div>
 
 <script>
 'use strict';
@@ -185,8 +191,8 @@ const FLASH={r:0,g:242,b:255};
 const BASE={warm:{r:24,g:40,b:207},white:{r:24,g:40,b:207},
             blue:{r:255,g:255,b:255},dark:{r:24,g:40,b:207},clear:{r:24,g:40,b:207}};
 
-// Optical kerning pairs — value = adjustment as fraction of fontSize
-// Negative = tighter, positive = looser. Applied progressively as spacing closes.
+// Optical kerning table — fraction of fontSize; negative=tighter, positive=looser
+// Applied progressively as spacing closes toward 0.
 const KERN={
   'NI':-0.18,'IC':-0.14,'TI':-0.13,'LI':-0.11,'FI':-0.10,'EI':-0.10,
   'ÓN':+0.06,'ON':+0.06,'CA':+0.05,'FÓ':-0.07,'LE':-0.04,'TE':-0.04,
@@ -201,13 +207,18 @@ let scenes=[];
 let showLines=true;
 let pathUpright=false;
 let teleportMode=false;
-let layoutRot=0;        // 0=0° 1=90° 2=180° 3=270°
-// Alive
+let keepReadable=false;  // rotate layout positions but keep glyphs at reading angle
+let layoutRot=0;         // 0–3 × 90°
+let justify=false;       // expand short lines to match widest
+let staggerAlt=false;    // alternating vs progressive stagger
 let flowMode=false,flowTimer=0;
 let pulseMode=false,pulseTimer=0;
 let aliveInterval=3.0;
-let P={sp:60,sz:80,spd:8,ten:6,rad:180,cols:4};
-try{scenes=JSON.parse(localStorage.getItem('tf5-scenes')||'[]');}catch(e){}
+let flowCycleCount=0;
+let lastInteract=0;      // gNow seconds at last user touch
+let autoFlowFired=false; // idle auto-flow triggers once per session
+let P={sp:60,sz:80,spd:8,ten:6,rad:180,cols:4,stagger:0};
+try{scenes=JSON.parse(localStorage.getItem('tf6-scenes')||'[]');}catch(e){}
 
 // ── Easing ─────────────────────────────────────────────────────
 function ease(t){
@@ -217,31 +228,71 @@ function ease(t){
   return Math.min(1.015,0.84+0.20*p+0.022*Math.sin(p*Math.PI*3.5)*Math.pow(1-p,1.2));
 }
 
-// ── Optical kerning positions for a given char array ───────────
-// Returns centred x offsets with pair-kerning applied.
-// Kern effect scales 0→1 as spacing closes from 80px to 0px.
+// ── Optical positions ──────────────────────────────────────────
+// Returns {xps: centred x array, span: total width}
 function optPos(chars){
   const baseW=P.sz*0.56;
   const kScale=Math.max(0,1-P.sp/80);
-  const offs=[0];
+  const raw=[0];
   let x=0;
   for(let i=0;i<chars.length-1;i++){
     const k=(KERN[chars[i]+chars[i+1]]||0)*P.sz*kScale;
     x+=baseW+P.sp+k;
-    offs.push(x);
+    raw.push(x);
   }
-  const total=offs[offs.length-1]+baseW;
-  return offs.map(o=>o-total/2+baseW/2);
+  const span=raw[raw.length-1]+baseW;
+  const xps=raw.map(o=>o-span/2+baseW/2);
+  return{xps,span};
 }
 
-// ── Global layout rotation (0°/90°/180°/270°) ──────────────────
+// True justification: stretches positions so the outer edges of the
+// first and last glyph land exactly at ±targetSpan/2.
+// The scaling is applied to raw advances (not centred coords) to be exact.
+function justPos(chars,targetSpan){
+  const baseW=P.sz*0.56;
+  const kScale=Math.max(0,1-P.sp/80);
+  const raw=[0];
+  let x=0;
+  for(let i=0;i<chars.length-1;i++){
+    const k=(KERN[chars[i]+chars[i+1]]||0)*P.sz*kScale;
+    x+=baseW+P.sp+k;
+    raw.push(x);
+  }
+  if(!justify||chars.length<=1||raw[raw.length-1]===0){
+    // Natural centred layout
+    const span=raw[raw.length-1]+baseW;
+    return raw.map(o=>o-span/2+baseW/2);
+  }
+  // Stretch: left edge of char[0] → -targetSpan/2, right edge of char[N-1] → +targetSpan/2
+  const targetAdv=targetSpan-baseW;        // advance span between char centres
+  const scale=targetAdv/raw[raw.length-1];
+  const startX=-targetSpan/2+baseW/2;     // centre of char[0]
+  return raw.map(o=>startX+o*scale);
+}
+
+// Per-line stagger offset given row index and total rows
+function staggerOff(rowIdx,numRows){
+  const st=P.stagger;
+  if(staggerAlt){
+    return (rowIdx%2===0?-1:1)*st;
+  }else{
+    // Progressive: centred so middle row is at 0
+    return (rowIdx-(numRows-1)/2)*st;
+  }
+}
+
+// ── Layout rotation (positions + optionally glyphs) ────────────
 function rotateLayout(pos){
   if(layoutRot===0)return pos;
   const a=layoutRot*Math.PI/2;
   const cos=Math.cos(a),sin=Math.sin(a);
   return pos.map(p=>{
     const dx=p.x-W/2,dy=p.y-H/2;
-    return{x:W/2+dx*cos-dy*sin,y:H/2+dx*sin+dy*cos,r:p.r+a};
+    return{
+      x:W/2+dx*cos-dy*sin,
+      y:H/2+dx*sin+dy*cos,
+      r:keepReadable?0:p.r+a   // keepReadable = keep glyphs horizontal
+    };
   });
 }
 
@@ -261,7 +312,6 @@ class Letter{
     this.delay=0;
     this.pulse=0;this.pw=0;
     this.tpThresh=2;this.tpDone=false;
-    // Breath phase — unique per letter so they don't all move together
     this.bPhaseX=Math.random()*Math.PI*2;
     this.bPhaseY=Math.random()*Math.PI*2;
   }
@@ -269,8 +319,7 @@ class Letter{
     if(this.pinned)return;
     this.tx=tx;this.ty=ty;this.tr=tr||0;
     this.settled=false;this.t=0;this.delay=delay||0;
-    this.sx=this.x;this.sy=this.y;
-    this.ex=tx;this.ey=ty;
+    this.sx=this.x;this.sy=this.y;this.ex=tx;this.ey=ty;
     this.tpDone=false;
     this.tpThresh=teleportMode?(0.25+Math.random()*0.2):2;
     const dx=tx-this.x,dy=ty-this.y,d=Math.hypot(dx,dy)||1;
@@ -296,15 +345,12 @@ class Letter{
     const rate=(P.spd/10)*(0.32+P.ten/20*1.3);
     this.t=Math.min(1,this.t+dt*rate);
     if(!this.tpDone&&this.t>=this.tpThresh){
-      this.tpDone=true;
-      this.x=this.tx;this.y=this.ty;this.rot=this.tr;
-      this.t=1;this.settled=true;
-      this.pulse=1.6;this.pw=0;
+      this.tpDone=true;this.x=this.tx;this.y=this.ty;this.rot=this.tr;
+      this.t=1;this.settled=true;this.pulse=1.6;this.pw=0;
       _prop(this,0,0.8,1);return;
     }
     const p=this._bz(Math.min(1,ease(this.t)));
-    this.x=p.x;this.y=p.y;
-    this.rot+=(this.tr-this.rot)*.14;
+    this.x=p.x;this.y=p.y;this.rot+=(this.tr-this.rot)*.14;
     if(this.t>=1){
       this.x=this.tx;this.y=this.ty;this.rot=this.tr;
       this.settled=true;this._settle();
@@ -317,12 +363,8 @@ class Letter{
     const r=Math.min(255,Math.max(0,Math.round(base.r+(FLASH.r-base.r)*gv)));
     const g=Math.min(255,Math.max(0,Math.round(base.g+(FLASH.g-base.g)*gv)));
     const b=Math.min(255,Math.max(0,Math.round(base.b+(FLASH.b-base.b)*gv)));
-    // Subtle breath — only when settled, very small (2px max)
-    const bAmp=this.settled?2:0;
-    const bx=Math.sin(now*0.33+this.bPhaseX)*bAmp;
-    const by=Math.cos(now*0.27+this.bPhaseY)*bAmp;
     cx.save();
-    cx.translate(this.x+bx,this.y+by);
+    cx.translate(this.x,this.y);
     cx.rotate(this.rot);
     cx.font=`700 ${P.sz}px "Helvetica Neue",Helvetica,Arial,sans-serif`;
     cx.fillStyle=`rgb(${r},${g},${b})`;
@@ -351,7 +393,6 @@ function _prop(src,hop,amt,wBias){
   },88+k*52));
 }
 
-// Word-order pulse: ripples T→E→L→E→F→Ó→N→I→C→A with delay
 function wordPulse(){
   letters.forEach((l,i)=>setTimeout(()=>{l.pulse=0.75;l.pw=0;},i*110));
 }
@@ -360,29 +401,49 @@ function wordPulse(){
 function cw(){return P.sz*.56+P.sp;}
 
 // ── Square perimeter ───────────────────────────────────────────
+// Letters are distributed across 4 sides so the first letter on each
+// side always lands exactly on a corner.
+// justify=on  → letters spread evenly to fill each full side.
+// justify=off → letters spaced by cw() from the corner.
 function squarePerimFn(){
-  const half=P.rad,side=half*2,perim=side*4,step=perim/N;
-  return CH.map((_,i)=>{
-    let d=i*step,x,y,r;
-    if(d<side){x=W/2-half+d;y=H/2-half;r=pathUpright?0:0;}
-    else if(d<side*2){d-=side;x=W/2+half;y=H/2-half+d;r=pathUpright?0:Math.PI/2;}
-    else if(d<side*3){d-=side*2;x=W/2+half-d;y=H/2+half;r=pathUpright?0:Math.PI;}
-    else{d-=side*3;x=W/2-half;y=H/2+half-d;r=pathUpright?0:-Math.PI/2;}
-    return{x,y,r};
-  });
+  const half=P.rad, side=half*2;
+  const base=Math.floor(N/4), extra=N%4;
+  // Distribute N letters across sides: first `extra` sides get one more
+  const sideCounts=Array.from({length:4},(_,i)=>base+(i<extra?1:0));
+
+  // Geometry functions: t=0 at corner, t=1 at next corner
+  const geom=[
+    t=>({x:W/2-half+t*side, y:H/2-half,       r:pathUpright?0:0}),
+    t=>({x:W/2+half,        y:H/2-half+t*side, r:pathUpright?0:Math.PI/2}),
+    t=>({x:W/2+half-t*side, y:H/2+half,        r:pathUpright?0:Math.PI}),
+    t=>({x:W/2-half,        y:H/2+half-t*side, r:pathUpright?0:-Math.PI/2}),
+  ];
+
+  const result=[];
+  for(let s=0;s<4;s++){
+    const k=sideCounts[s];
+    for(let i=0;i<k;i++){
+      // justify: fill the side fully (spacing = side/k)
+      // natural: space by cw() from corner, capped at side
+      const t=justify ? i/k : Math.min(i*cw()/side, 0.999);
+      result.push(geom[s](t));
+    }
+  }
+  return result;
 }
 
 // ── Arrangements ───────────────────────────────────────────────
 const PATH_KEYS=new Set(['circle','doubleCircle','orbit','squarePerim']);
 const GRID_KEYS=new Set(['grid']);
+const ML_KEYS  =new Set(['twoLine','threeLine','grid']); // multi-line: show stagger/justify
 
 const ARR={
   line:{
-    tip:'Single line — optical kerning applied',
+    tip:'Single line — optical kerning',
     svg:'<svg viewBox="0 0 18 18" fill="none"><line x1="1" y1="9" x2="17" y2="9" stroke="currentColor" stroke-width="1.5"/></svg>',
     fn(){
-      const xp=optPos(CH);
-      return rotateLayout(CH.map((_,i)=>({x:W/2+xp[i],y:H/2,r:0})));
+      const{xps}=optPos(CH);
+      return rotateLayout(CH.map((_,i)=>({x:W/2+xps[i],y:H/2,r:0})));
     }
   },
   twoLine:{
@@ -391,11 +452,15 @@ const ARR={
     fn(){
       const sp=4,lh=P.sz*1.35;
       const r0=CH.slice(0,sp),r1=CH.slice(sp);
-      const xp0=optPos(r0),xp1=optPos(r1);
+      const o0=optPos(r0),o1=optPos(r1);
+      const maxSpan=Math.max(o0.span,o1.span);
+      const xp0=justPos(r0,maxSpan), xp1=justPos(r1,maxSpan);
+      const numRows=2;
       return rotateLayout(CH.map((_,i)=>{
         const row=i<sp?0:1;
         const xp=row===0?xp0[i]:xp1[i-sp];
-        return{x:W/2+xp,y:H/2-lh/2+row*lh,r:0};
+        const off=staggerOff(row,numRows);
+        return{x:W/2+xp+off,y:H/2-lh/2+row*lh,r:0};
       }));
     }
   },
@@ -405,11 +470,15 @@ const ARR={
     fn(){
       const segs=[[0,2],[2,6],[6,10]],lh=P.sz*1.32;
       const rows=segs.map(([s,e])=>CH.slice(s,e));
-      const xps=rows.map(r=>optPos(r));
+      const opts=rows.map(r=>optPos(r));
+      const maxSpan=Math.max(...opts.map(o=>o.span));
+      const xps=rows.map((r,ri)=>justPos(r,maxSpan));
+      const numRows=3;
       return rotateLayout(CH.map((_,i)=>{
         const ri=segs.findIndex(([s,e])=>i>=s&&i<e);
         const[s]=segs[ri];
-        return{x:W/2+xps[ri][i-s],y:H/2-lh+ri*lh,r:0};
+        const off=staggerOff(ri,numRows);
+        return{x:W/2+xps[ri][i-s]+off,y:H/2-lh+ri*lh,r:0};
       }));
     }
   },
@@ -417,18 +486,21 @@ const ARR={
     tip:'Grid — use Columns slider',
     svg:'<svg viewBox="0 0 18 18" fill="none"><circle cx="3" cy="6" r="1.4" fill="currentColor"/><circle cx="9" cy="6" r="1.4" fill="currentColor"/><circle cx="15" cy="6" r="1.4" fill="currentColor"/><circle cx="3" cy="13" r="1.4" fill="currentColor"/><circle cx="9" cy="13" r="1.4" fill="currentColor"/><circle cx="15" cy="13" r="1.4" fill="currentColor"/></svg>',
     fn(){
-      const cols=Math.max(1,P.cols),ch=P.sz*1.45,rows=Math.ceil(N/cols);
-      // Per-row optical kerning
+      const cols=Math.max(1,P.cols),ch=P.sz*1.45,numRows=Math.ceil(N/cols);
+      // Per-row optical kerning + justify + stagger
+      const rowArrs=Array.from({length:numRows},(_,ri)=>CH.slice(ri*cols,Math.min((ri+1)*cols,N)));
+      const opts=rowArrs.map(r=>optPos(r));
+      const maxSpan=Math.max(...opts.map(o=>o.span));
+      const xps=rowArrs.map((r,ri)=>justPos(r,maxSpan));
       return rotateLayout(CH.map((_,i)=>{
         const row=Math.floor(i/cols),col=i%cols;
-        const rowChars=CH.slice(row*cols,Math.min((row+1)*cols,N));
-        const xp=optPos(rowChars);
-        return{x:W/2+(xp[col]||0),y:H/2-(rows-1)*ch/2+row*ch,r:0};
+        const off=staggerOff(row,numRows);
+        return{x:W/2+(xps[row][col]||0)+off,y:H/2-(numRows-1)*ch/2+row*ch,r:0};
       }));
     }
   },
   squarePerim:{
-    tip:'Square perimeter — letters run around the edge',
+    tip:'Square perimeter — letters run around the edge from top-left',
     svg:'<svg viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="14" height="14" stroke="currentColor" stroke-width="1.2"/><circle cx="2" cy="2" r="1.2" fill="currentColor"/><circle cx="16" cy="2" r="1.2" fill="currentColor"/><circle cx="16" cy="16" r="1.2" fill="currentColor"/><circle cx="2" cy="16" r="1.2" fill="currentColor"/></svg>',
     fn(){return squarePerimFn();}
   },
@@ -472,18 +544,33 @@ function apply(key){
   arrKey=key;
   const a=ARR[key];if(!a)return;
   const pos=a.fn();
-  const isPath=PATH_KEYS.has(key),isGrid=GRID_KEYS.has(key);
-  document.getElementById('rrow').style.display   =isPath?'':'none';
-  document.getElementById('gcrow').style.display  =isGrid?'':'none';
+  const isPath=PATH_KEYS.has(key),isGrid=GRID_KEYS.has(key),isML=ML_KEYS.has(key);
+  document.getElementById('rrow').style.display    =isPath?'':'none';
+  document.getElementById('gcrow').style.display   =isGrid?'':'none';
+  document.getElementById('ml-opts').style.display =isML?'':'none';
+  document.getElementById('ml-div').style.display  =isML?'':'none';
   document.getElementById('path-opts').style.display=isPath?'':'none';
   document.getElementById('path-div').style.display =isPath?'':'none';
   letters.forEach((l,i)=>l.goto(pos[i].x,pos[i].y,pos[i].r,i*.038+Math.random()*.018));
   document.querySelectorAll('.arr-btn').forEach(b=>b.classList.toggle('active',b.dataset.key===key));
 }
 
+// Overlap-free scatter using iterative placement
 function scatter(){
-  const m=P.sz*1.4;
-  letters.forEach((l,i)=>{if(!l.pinned)l.goto(m+Math.random()*(W-m*2),m+Math.random()*(H-m*2),0,i*.025);});
+  const m=P.sz*1.5;
+  const minD=P.sz*0.72;  // minimum centre-to-centre distance
+  const placed=[];
+  letters.forEach((l,i)=>{
+    if(l.pinned)return;
+    let x,y,tries=0;
+    do{
+      x=m+Math.random()*(W-m*2);
+      y=m+Math.random()*(H-m*2);
+      tries++;
+    }while(tries<120&&placed.some(p=>Math.hypot(p.x-x,p.y-y)<minD));
+    placed.push({x,y});
+    l.goto(x,y,0,i*.025);
+  });
   document.querySelectorAll('.arr-btn').forEach(b=>b.classList.remove('active'));
 }
 
@@ -494,8 +581,30 @@ function findOrder(){
   letters.forEach((l,i)=>{if(!l.pinned)l.goto(pts[i].x,pts[i].y,pts[i].r,i*.055);});
 }
 
-// ── Flow: randomly sequences arrangements ──────────────────────
+function setSlider(id,vid,val){
+  document.getElementById(id).value=val;
+  document.getElementById(vid).textContent=val;
+}
 function flowStep(){
+  flowCycleCount++;
+  // Tension varies every cycle — controls the snap feel
+  P.ten=Math.round(3+Math.random()*14);
+  setSlider('r3','v3',P.ten);
+  // Speed varies every 2 cycles
+  if(flowCycleCount%2===0){
+    P.spd=Math.round(4+Math.random()*13);
+    setSlider('r2','v2',P.spd);
+  }
+  // Size varies every 5 cycles — stays consistent for several arrangements
+  if(flowCycleCount%5===0){
+    P.sz=Math.round(48+Math.random()*88);
+    setSlider('r1','v1',P.sz);
+  }
+  // Randomly toggle justify — only meaningful for multi-line arrangements
+  justify=Math.random()>0.5;
+  document.getElementById('btn-justify').textContent=justify?'Justified':'Justify';
+  document.getElementById('btn-justify').classList.toggle('on',justify);
+  // Pick and apply a random different arrangement
   const keys=Object.keys(ARR).filter(k=>k!==arrKey);
   apply(keys[Math.floor(Math.random()*keys.length)]);
 }
@@ -533,10 +642,19 @@ function render(){
 // ── Loop ───────────────────────────────────────────────────────
 let last=0;
 function loop(ts){
-  const dt=Math.min((ts-last)/1000,.05);last=ts;
-  gNow=ts/1000; // seconds, for breath
+  const dt=Math.min((ts-last)/1000,.05);last=ts;gNow=ts/1000;
   letters.forEach(l=>l.update(dt));
   forces();
+  // Idle auto-flow: triggers once after 10s of no interaction
+  if(!autoFlowFired&&!flowMode&&gNow-lastInteract>=10){
+    autoFlowFired=true;
+    teleportMode=true; aliveInterval=3.5; flowMode=true; flowTimer=0; flowCycleCount=0;
+    document.getElementById('btn-tport').textContent='Teleport';
+    document.getElementById('btn-tport').classList.remove('on');
+    document.getElementById('btn-flow').textContent='Flow on';
+    document.getElementById('btn-flow').classList.add('on');
+    document.getElementById('r6').value=22; document.getElementById('v6').textContent='2.2';
+  }
   if(flowMode){flowTimer+=dt;if(flowTimer>=aliveInterval){flowTimer=0;flowStep();}}
   if(pulseMode){pulseTimer+=dt;if(pulseTimer>=aliveInterval){pulseTimer=0;wordPulse();}}
   render();
@@ -548,7 +666,7 @@ function saveScene(){
   const name=prompt('Name:',`Scene ${scenes.length+1}`);if(!name)return;
   scenes.push({id:Date.now(),name,key:arrKey,bg,p:{...P},rot:layoutRot,
     pos:letters.map(l=>({x:l.x,y:l.y,r:l.rot,pin:l.pinned}))});
-  try{localStorage.setItem('tf5-scenes',JSON.stringify(scenes));}catch(e){}
+  try{localStorage.setItem('tf6-scenes',JSON.stringify(scenes));}catch(e){}
   renderScenes();
 }
 function loadScene(s){
@@ -565,7 +683,7 @@ function renderScenes(){
     row.querySelector('.sn').onclick=()=>loadScene(s);
     row.querySelector('.sd').onclick=e=>{
       e.stopPropagation();scenes=scenes.filter(x=>x.id!==s.id);
-      try{localStorage.setItem('tf5-scenes',JSON.stringify(scenes));}catch(e){}
+      try{localStorage.setItem('tf6-scenes',JSON.stringify(scenes));}catch(e){}
       renderScenes();
     };
     el.appendChild(row);
@@ -580,10 +698,10 @@ function syncSliders(){
   [['r0','v0','sp'],['r1','v1','sz'],['r2','v2','spd'],['r3','v3','ten'],['r4','v4','rad'],['r5','v5','cols']].forEach(([r,v,k])=>{
     document.getElementById(r).value=P[k];document.getElementById(v).textContent=P[k];
   });
+  document.getElementById('rs').value=P.stagger;document.getElementById('vs').textContent=P.stagger;
 }
 function updateRotBtn(){
-  const degs=[0,90,180,270];
-  document.getElementById('btn-axis').textContent=`↻ ${degs[layoutRot]}°`;
+  document.getElementById('btn-axis').textContent=`↻ ${[0,90,180,270][layoutRot]}°`;
 }
 function resize(){W=cv.width=window.innerWidth;H=cv.height=window.innerHeight;}
 function letterAt(x,y){
@@ -599,13 +717,11 @@ window.addEventListener('load',()=>{
   window.addEventListener('resize',()=>{resize();apply(arrKey);});
   letters=CH.map((c,i)=>new Letter(c,i));
 
-  // Arrangement buttons
   const agrid=document.getElementById('agrid');
   Object.entries(ARR).forEach(([key,a])=>{
     const b=document.createElement('button');
     b.className='arr-btn';b.dataset.key=key;b.title=a.tip;b.innerHTML=a.svg;
-    b.addEventListener('click',()=>apply(key));
-    agrid.appendChild(b);
+    b.addEventListener('click',()=>apply(key));agrid.appendChild(b);
   });
 
   // Sliders
@@ -615,9 +731,22 @@ window.addEventListener('load',()=>{
       if(['sp','sz','rad','cols'].includes(pk))apply(arrKey);
     });
   });
+  document.getElementById('rs').addEventListener('input',e=>{
+    P.stagger=+e.target.value;document.getElementById('vs').textContent=P.stagger;apply(arrKey);
+  });
   document.getElementById('r6').addEventListener('input',e=>{
-    aliveInterval=+e.target.value/10;
-    document.getElementById('v6').textContent=aliveInterval.toFixed(1);
+    aliveInterval=+e.target.value/10;document.getElementById('v6').textContent=aliveInterval.toFixed(1);
+  });
+
+  // Justify
+  document.getElementById('btn-justify').addEventListener('click',e=>{
+    justify=!justify;e.target.classList.toggle('on',justify);
+    e.target.textContent=justify?'Justified':'Justify';apply(arrKey);
+  });
+  // Stagger alt
+  document.getElementById('btn-stagger-alt').addEventListener('click',e=>{
+    staggerAlt=!staggerAlt;e.target.classList.toggle('on',staggerAlt);
+    e.target.textContent=staggerAlt?'Alt on':'Alt stagger';apply(arrKey);
   });
 
   // Mouse modes
@@ -633,35 +762,34 @@ window.addEventListener('load',()=>{
   // Teleport
   document.getElementById('btn-tport').addEventListener('click',e=>{
     teleportMode=!teleportMode;
-    e.target.textContent=teleportMode?'Teleport':'Travel';
-    e.target.classList.toggle('on',!teleportMode);
+    e.target.textContent=teleportMode?'Teleport':'Travel';e.target.classList.toggle('on',!teleportMode);
   });
 
-  // Layout rotation — cycles 0°→90°→180°→270°→0°
+  // Readable (keep glyphs horizontal when layout is rotated)
+  document.getElementById('btn-readable').addEventListener('click',e=>{
+    keepReadable=!keepReadable;
+    e.target.classList.toggle('on',keepReadable);apply(arrKey);
+  });
+
+  // Layout rotation
   document.getElementById('btn-axis').addEventListener('click',()=>{
-    layoutRot=(layoutRot+1)%4;
-    updateRotBtn();
-    apply(arrKey);
+    layoutRot=(layoutRot+1)%4;updateRotBtn();apply(arrKey);
   });
 
   // Upright (path arrangements)
   document.getElementById('btn-upright').addEventListener('click',e=>{
     pathUpright=!pathUpright;
-    e.target.textContent=pathUpright?'Upright on':'Upright off';
-    e.target.classList.toggle('on',pathUpright);
-    apply(arrKey);
+    e.target.textContent=pathUpright?'Upright on':'Upright off';e.target.classList.toggle('on',pathUpright);apply(arrKey);
   });
 
   // Alive
   document.getElementById('btn-flow').addEventListener('click',e=>{
-    flowMode=!flowMode;flowTimer=0;
-    e.target.classList.toggle('on',flowMode);
+    flowMode=!flowMode;flowTimer=0;e.target.classList.toggle('on',flowMode);
     e.target.textContent=flowMode?'Flow on':'Flow';
     if(pulseMode){pulseMode=false;document.getElementById('btn-pulse').classList.remove('on');document.getElementById('btn-pulse').textContent='Pulse';}
   });
   document.getElementById('btn-pulse').addEventListener('click',e=>{
-    pulseMode=!pulseMode;pulseTimer=0;
-    e.target.classList.toggle('on',pulseMode);
+    pulseMode=!pulseMode;pulseTimer=0;e.target.classList.toggle('on',pulseMode);
     e.target.textContent=pulseMode?'Pulse on':'Pulse';
     if(flowMode){flowMode=false;document.getElementById('btn-flow').classList.remove('on');document.getElementById('btn-flow').textContent='Flow';}
   });
@@ -671,21 +799,27 @@ window.addEventListener('load',()=>{
     showLines=!showLines;e.target.textContent=showLines?'Lines on':'Lines off';
     e.target.classList.toggle('on',showLines);if(!showLines)conns=[];
   });
-
-  // Find order
   document.getElementById('btn-order').addEventListener('click',findOrder);
 
   // Scenes / export
   document.getElementById('bsave').addEventListener('click',saveScene);
   document.getElementById('bexport').addEventListener('click',()=>{
     render();const a=document.createElement('a');
-    a.download='telefonica-'+Date.now()+'.png';
-    a.href=cv.toDataURL('image/png');a.click();
+    a.download='telefonica-'+Date.now()+'.png';a.href=cv.toDataURL('image/png');a.click();
   });
 
   // Mouse
+  function onInteract(){
+    lastInteract=gNow;
+    if(autoFlowFired&&flowMode){
+      flowMode=false;
+      document.getElementById('btn-flow').textContent='Flow';
+      document.getElementById('btn-flow').classList.remove('on');
+    }
+  }
+
   cv.addEventListener('mousedown',e=>{
-    mx=e.clientX;my=e.clientY;mdown=true;
+    mx=e.clientX;my=e.clientY;mdown=true;onInteract();
     const hit=letterAt(mx,my);
     if(mode==='pin'){if(hit)hit.pinned=!hit.pinned;return;}
     if(mode==='free'&&hit){dragging=hit;dox=hit.x-mx;doy=hit.y-my;}
@@ -705,13 +839,12 @@ window.addEventListener('load',()=>{
   });
   cv.addEventListener('contextmenu',e=>{e.preventDefault();const hit=letterAt(e.clientX,e.clientY);if(hit)hit.pinned=!hit.pinned;});
 
-  // Touch
-  cv.addEventListener('touchstart',e=>{e.preventDefault();const t=e.touches[0];mx=t.clientX;my=t.clientY;mdown=true;const hit=letterAt(mx,my);if(hit&&mode==='free'){dragging=hit;dox=hit.x-mx;doy=hit.y-my;}},{passive:false});
+  cv.addEventListener('touchstart',e=>{e.preventDefault();const t=e.touches[0];mx=t.clientX;my=t.clientY;mdown=true;onInteract();const hit=letterAt(mx,my);if(hit&&mode==='free'){dragging=hit;dox=hit.x-mx;doy=hit.y-my;}},{passive:false});
   cv.addEventListener('touchmove',e=>{e.preventDefault();const t=e.touches[0];mx=t.clientX;my=t.clientY;if(dragging){dragging.x=mx+dox;dragging.y=my+doy;}},{passive:false});
   cv.addEventListener('touchend',()=>{mdown=false;if(dragging){const l=dragging;dragging=null;l.tx=l.x;l.ty=l.y;l.settled=true;}});
 
-  // Keys
   window.addEventListener('keydown',e=>{
+    onInteract();
     if(e.code==='Space'){e.preventDefault();scatter();}
     if(e.code==='Enter')apply(arrKey);
     if(e.code==='KeyO')findOrder();
