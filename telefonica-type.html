@@ -3,24 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <title>TELEFÓNICA — Generative Typography</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,700;1,700&family=Playfair+Display:wght@700&family=DM+Sans:wght@700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;height:100%;overflow:hidden}
 body{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;background:#f5f0ef}
 #c{display:block;position:fixed;top:0;left:0;width:100%;height:100%}
-#panel{position:fixed;right:20px;top:50%;transform:translateY(-50%);
-  width:196px;display:flex;flex-direction:column;gap:11px;
+#panel{position:fixed;right:16px;top:50%;transform:translateY(-50%);
+  width:180px;display:flex;flex-direction:column;gap:8px;
   background:rgba(245,240,239,0.93);backdrop-filter:blur(16px);
-  border:1px solid rgba(0,0,0,0.09);padding:16px;z-index:10;
+  border:1px solid rgba(0,0,0,0.09);padding:12px;z-index:10;
   max-height:96vh;overflow-y:auto}
 #panel::-webkit-scrollbar{display:none}
 .lbl{font-size:7.5px;letter-spacing:.13em;text-transform:uppercase;
   color:rgba(0,0,0,.3);display:flex;justify-content:space-between;margin-bottom:4px}
 .lbl em{font-style:normal;color:rgba(0,0,0,.5);letter-spacing:0}
-.sec{display:flex;flex-direction:column;gap:9px}
+.lbl span{white-space:nowrap}
+.sec{display:flex;flex-direction:column;gap:7px}
 .div{height:1px;background:rgba(0,0,0,.07);flex-shrink:0}
 .arr-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
-.arr-btn{width:100%;height:34px;border:1px solid rgba(0,0,0,.12);background:transparent;
+.arr-btn{width:100%;height:28px;border:1px solid rgba(0,0,0,.12);background:transparent;
   cursor:pointer;display:flex;align-items:center;justify-content:center;
   color:rgba(0,0,0,.38);transition:background .1s,border-color .1s,color .1s;padding:0}
 .arr-btn svg{width:16px;height:16px;display:block;flex-shrink:0;pointer-events:none}
@@ -31,7 +35,7 @@ input[type=range]{-webkit-appearance:none;width:100%;height:1px;
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:8px;height:8px;
   border-radius:50%;background:#1828CF;cursor:pointer}
 .row{display:flex;gap:4px}
-.btn{flex:1;height:24px;border:1px solid rgba(0,0,0,.12);background:transparent;
+.btn{flex:1;height:20px;border:1px solid rgba(0,0,0,.12);background:transparent;
   font-size:7px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;
   font-family:inherit;color:rgba(0,0,0,.46);transition:all .1s;white-space:nowrap}
 .btn:hover,.btn.on{background:#1828CF;border-color:#1828CF;color:#fff}
@@ -45,11 +49,16 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:8px;height
 .si:hover .sn{color:#1828CF}
 .si .sd{opacity:.22;font-size:11px;padding:0 2px;cursor:pointer}
 .si .sd:hover{opacity:1;color:red}
-.ab{width:100%;height:24px;border:1px solid rgba(0,0,0,.14);background:transparent;
-  font-size:7.5px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;
+.ab{width:100%;height:20px;border:1px solid rgba(0,0,0,.14);background:transparent;
+  font-size:7px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;
   font-family:inherit;color:rgba(0,0,0,.44);transition:all .1s}
 .ab:hover{background:#1828CF;border-color:#1828CF;color:#fff}
 .ab.on{background:#1828CF;border-color:#1828CF;color:#fff}
+#font-select{width:100%;height:20px;border:1px solid rgba(0,0,0,.12);background:transparent;
+  font-size:7.5px;letter-spacing:.06em;color:rgba(0,0,0,.52);cursor:pointer;
+  font-family:inherit;outline:none;padding:0 4px;-webkit-appearance:none;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='0 0 8 5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='rgba(0,0,0,.3)'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 6px center}
 #hint{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);
   font-size:7.5px;letter-spacing:.12em;text-transform:uppercase;
   color:rgba(0,0,0,.18);pointer-events:none;white-space:nowrap}
@@ -64,6 +73,8 @@ body.on-blue input[type=range]::-webkit-slider-thumb{background:#fff}
 body.on-blue .btn{border-color:rgba(255,255,255,.18);color:rgba(255,255,255,.4)}
 body.on-blue .btn:hover,.on-blue .btn.on{background:#fff;border-color:#fff;color:#1828CF}
 body.on-blue .btn.on{background:#fff;border-color:#fff;color:#1828CF}
+body.on-blue #font-select{border-color:rgba(255,255,255,.18);color:rgba(255,255,255,.5);background-color:transparent}
+body.on-dark #font-select{border-color:rgba(255,255,255,.14);color:rgba(255,255,255,.46);background-color:transparent}
 body.on-blue .ab{border-color:rgba(255,255,255,.18);color:rgba(255,255,255,.4)}
 body.on-blue .ab:hover,.on-blue .ab.on{background:#fff;border-color:#fff;color:#1828CF}
 body.on-blue .ab.on{background:#fff;border-color:#fff;color:#1828CF}
@@ -103,7 +114,7 @@ body.on-dark #hint{color:rgba(255,255,255,.14)}
     <div><div class="lbl">Size <em id="v1">80</em></div><input type="range" id="r1" min="20" max="160" value="80"></div>
     <div><div class="lbl">Speed <em id="v2">8</em></div><input type="range" id="r2" min="1" max="20" value="8"></div>
     <div><div class="lbl">Tension <em id="v3">6</em></div><input type="range" id="r3" min="1" max="20" value="6"></div>
-    <div id="rrow" style="display:none"><div class="lbl">Radius <em id="v4">180</em></div><input type="range" id="r4" min="60" max="500" value="180"></div>
+    <div id="rrow" style="display:none"><div class="lbl"><span id="rrow-lbl">Radius</span> <em id="v4">180</em></div><input type="range" id="r4" min="60" max="500" value="180"></div>
     <div id="gcrow" style="display:none"><div class="lbl">Columns <em id="v5">4</em></div><input type="range" id="r5" min="1" max="10" value="4"></div>
   </div>
   <div class="div"></div>
@@ -117,6 +128,15 @@ body.on-dark #hint{color:rgba(255,255,255,.14)}
     <div><div class="lbl">Stagger <em id="vs">0</em>px</div><input type="range" id="rs" min="-300" max="300" value="0"></div>
   </div>
   <div id="ml-div" class="div" style="display:none"></div>
+  <!-- Frame split presets — only shown for squarePerim -->
+  <div id="sq-opts" style="display:none" class="sec">
+    <div class="lbl">Frame split</div>
+    <div class="row">
+      <button class="btn frame-split on" data-fsplit="0">4·2·4</button>
+      <button class="btn frame-split" data-fsplit="1">3·2·2·3</button>
+    </div>
+  </div>
+  <div id="sq-div" class="div" style="display:none"></div>
   <!-- Path controls -->
   <div id="path-opts" style="display:none" class="sec">
     <div class="row"><button class="btn" id="btn-upright">Upright off</button></div>
@@ -174,6 +194,11 @@ body.on-dark #hint{color:rgba(255,255,255,.14)}
   </div>
   <div class="div"></div>
   <div class="sec">
+    <div class="lbl">Typeface</div>
+    <select id="font-select"></select>
+  </div>
+  <div class="div"></div>
+  <div class="sec">
     <div class="lbl">Scenes</div>
     <div id="slist"></div>
     <button class="ab" id="bsave">Save Scene</button>
@@ -186,17 +211,55 @@ body.on-dark #hint{color:rgba(255,255,255,.14)}
 <script>
 'use strict';
 const WORD='TELEFÓNICA', CH=WORD.split(''), N=CH.length;
+
+// ── Font definitions ───────────────────────────────────────────
+// widthRatio: average glyph width as fraction of fontSize (measured for bold weight)
+// kern: pair adjustments specific to this typeface
+const FONTS={
+  helvetica:{
+    label:'Helvetica Neue',
+    family:'"Helvetica Neue",Helvetica,Arial,sans-serif',
+    widthRatio:0.56,
+    kern:{
+      'NI':-0.18,'IC':-0.14,'TI':-0.13,'LI':-0.11,'FI':-0.10,'EI':-0.10,
+      'ÓN':+0.06,'ON':+0.06,'CA':+0.05,'FÓ':-0.07,'LE':-0.04,'TE':-0.04,
+    }
+  },
+  notoSerif:{
+    label:'Noto Serif',
+    family:'"Noto Serif",Georgia,serif',
+    widthRatio:0.60,
+    kern:{
+      'NI':-0.10,'IC':-0.08,'TI':-0.10,'LI':-0.08,'FI':-0.08,'EI':-0.06,
+      'ÓN':+0.05,'ON':+0.05,'CA':+0.04,'FÓ':-0.05,'LE':-0.03,'TE':-0.05,
+      'TE':-0.05,'EL':-0.02,
+    }
+  },
+  playfair:{
+    label:'Playfair Display',
+    family:'"Playfair Display",Georgia,serif',
+    widthRatio:0.62,
+    kern:{
+      'NI':-0.09,'IC':-0.08,'TI':-0.12,'LI':-0.07,'FI':-0.09,'EI':-0.06,
+      'ÓN':+0.06,'ON':+0.06,'CA':+0.05,'FÓ':-0.06,'LE':-0.03,'TE':-0.06,
+    }
+  },
+  dmSans:{
+    label:'DM Sans',
+    family:'"DM Sans",sans-serif',
+    widthRatio:0.57,
+    kern:{
+      'NI':-0.14,'IC':-0.11,'TI':-0.11,'LI':-0.09,'FI':-0.09,'EI':-0.08,
+      'ÓN':+0.05,'ON':+0.05,'CA':+0.04,'FÓ':-0.06,'LE':-0.03,'TE':-0.03,
+    }
+  },
+};
+let currentFont=FONTS.helvetica;
 const BG_COLS={warm:'#f5f0ef',white:'#ffffff',blue:'#1828CF',dark:'#0d0d0d',clear:null};
 const FLASH={r:0,g:242,b:255};
 const BASE={warm:{r:24,g:40,b:207},white:{r:24,g:40,b:207},
             blue:{r:255,g:255,b:255},dark:{r:24,g:40,b:207},clear:{r:24,g:40,b:207}};
 
-// Optical kerning table — fraction of fontSize; negative=tighter, positive=looser
-// Applied progressively as spacing closes toward 0.
-const KERN={
-  'NI':-0.18,'IC':-0.14,'TI':-0.13,'LI':-0.11,'FI':-0.10,'EI':-0.10,
-  'ÓN':+0.06,'ON':+0.06,'CA':+0.05,'FÓ':-0.07,'LE':-0.04,'TE':-0.04,
-};
 
 let cv,cx,W,H;
 let letters=[],mx=0,my=0,mdown=false;
@@ -215,6 +278,9 @@ let flowMode=false,flowTimer=0;
 let pulseMode=false,pulseTimer=0;
 let aliveInterval=3.0;
 let flowCycleCount=0;
+let squareSplit=-1; // legacy, unused
+let frameSplit=0;  // 0=4·2·4, 1=3·2·2·3
+
 let P={sp:60,sz:80,spd:8,ten:6,rad:180,cols:4,stagger:0};
 try{scenes=JSON.parse(localStorage.getItem('tf6-scenes')||'[]');}catch(e){}
 
@@ -229,12 +295,12 @@ function ease(t){
 // ── Optical positions ──────────────────────────────────────────
 // Returns {xps: centred x array, span: total width}
 function optPos(chars){
-  const baseW=P.sz*0.56;
+  const baseW=P.sz*currentFont.widthRatio;
   const kScale=Math.max(0,1-P.sp/80);
   const raw=[0];
   let x=0;
   for(let i=0;i<chars.length-1;i++){
-    const k=(KERN[chars[i]+chars[i+1]]||0)*P.sz*kScale;
+    const k=(currentFont.kern[chars[i]+chars[i+1]]||0)*P.sz*kScale;
     x+=baseW+P.sp+k;
     raw.push(x);
   }
@@ -247,12 +313,12 @@ function optPos(chars){
 // first and last glyph land exactly at ±targetSpan/2.
 // The scaling is applied to raw advances (not centred coords) to be exact.
 function justPos(chars,targetSpan){
-  const baseW=P.sz*0.56;
+  const baseW=P.sz*currentFont.widthRatio;
   const kScale=Math.max(0,1-P.sp/80);
   const raw=[0];
   let x=0;
   for(let i=0;i<chars.length-1;i++){
-    const k=(KERN[chars[i]+chars[i+1]]||0)*P.sz*kScale;
+    const k=(currentFont.kern[chars[i]+chars[i+1]]||0)*P.sz*kScale;
     x+=baseW+P.sp+k;
     raw.push(x);
   }
@@ -364,7 +430,7 @@ class Letter{
     cx.save();
     cx.translate(this.x,this.y);
     cx.rotate(this.rot);
-    cx.font=`700 ${P.sz}px "Helvetica Neue",Helvetica,Arial,sans-serif`;
+    cx.font=`700 ${P.sz}px ${currentFont.family}`;
     cx.fillStyle=`rgb(${r},${g},${b})`;
     cx.textAlign='center';cx.textBaseline='middle';
     cx.fillText(this.ch,0,0);
@@ -396,38 +462,35 @@ function wordPulse(){
 }
 
 // ── Helpers ────────────────────────────────────────────────────
-function cw(){return P.sz*.56+P.sp;}
+function cw(){return P.sz*currentFont.widthRatio+P.sp;}
 
-// ── Square perimeter ───────────────────────────────────────────
-// Letters are distributed across 4 sides so the first letter on each
-// side always lands exactly on a corner.
-// justify=on  → letters spread evenly to fill each full side.
-// justify=off → letters spaced by cw() from the corner.
+// ── Square frame ───────────────────────────────────────────────
+// Frame layout: TELE across top, F/Ó at outer edges of middle row,
+// NICA across bottom. All letters upright.
+// justify=on  → top & bottom rows stretch to match the widest line.
+// Radius slider controls vertical row gap.
 function squarePerimFn(){
-  const half=P.rad, side=half*2;
-  const base=Math.floor(N/4), extra=N%4;
-  // Distribute N letters across sides: first `extra` sides get one more
-  const sideCounts=Array.from({length:4},(_,i)=>base+(i<extra?1:0));
+  const topChars=CH.slice(0,4);  // T E L E
+  const botChars=CH.slice(6,10); // N I C A
+  const lh=P.rad*0.9; // radius controls vertical row gap
 
-  // Geometry functions: t=0 at corner, t=1 at next corner
-  const geom=[
-    t=>({x:W/2-half+t*side, y:H/2-half,       r:pathUpright?0:0}),
-    t=>({x:W/2+half,        y:H/2-half+t*side, r:pathUpright?0:Math.PI/2}),
-    t=>({x:W/2+half-t*side, y:H/2+half,        r:pathUpright?0:Math.PI}),
-    t=>({x:W/2-half,        y:H/2+half-t*side, r:pathUpright?0:-Math.PI/2}),
-  ];
+  const oTop=optPos(topChars);
+  const oBot=optPos(botChars);
+  const maxSpan=Math.max(oTop.span,oBot.span);
+  const xpTop=justify?justPos(topChars,maxSpan):oTop.xps;
+  const xpBot=justify?justPos(botChars,maxSpan):oBot.xps;
 
-  const result=[];
-  for(let s=0;s<4;s++){
-    const k=sideCounts[s];
-    for(let i=0;i<k;i++){
-      // justify: fill the side fully (spacing = side/k)
-      // natural: space by cw() from corner, capped at side
-      const t=justify ? i/k : Math.min(i*cw()/side, 0.999);
-      result.push(geom[s](t));
-    }
-  }
-  return result;
+  // F and Ó sit at the leftmost/rightmost x of the top row
+  const xLeft =xpTop[0];
+  const xRight=xpTop[topChars.length-1];
+
+  const pos=[];
+  topChars.forEach((_,i)=>pos.push({x:W/2+xpTop[i], y:H/2-lh, r:0}));  // T E L E
+  pos.push({x:W/2+xLeft,  y:H/2, r:0});                                  // F
+  pos.push({x:W/2+xRight, y:H/2, r:0});                                  // Ó
+  botChars.forEach((_,i)=>pos.push({x:W/2+xpBot[i], y:H/2+lh, r:0}));  // N I C A
+
+  return rotateLayout(pos);
 }
 
 // ── Arrangements ───────────────────────────────────────────────
@@ -498,8 +561,8 @@ const ARR={
     }
   },
   squarePerim:{
-    tip:'Square perimeter — letters run around the edge from top-left',
-    svg:'<svg viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="14" height="14" stroke="currentColor" stroke-width="1.2"/><circle cx="2" cy="2" r="1.2" fill="currentColor"/><circle cx="16" cy="2" r="1.2" fill="currentColor"/><circle cx="16" cy="16" r="1.2" fill="currentColor"/><circle cx="2" cy="16" r="1.2" fill="currentColor"/></svg>',
+    tip:'Frame — TELE top · FÓ sides · NICA bottom',
+    svg:'<svg viewBox="0 0 18 18" fill="none"><line x1="2" y1="4" x2="16" y2="4" stroke="currentColor" stroke-width="1.5"/><circle cx="2" cy="9" r="1.3" fill="currentColor"/><circle cx="16" cy="9" r="1.3" fill="currentColor"/><line x1="2" y1="14" x2="16" y2="14" stroke="currentColor" stroke-width="1.5"/></svg>',
     fn(){return squarePerimFn();}
   },
   circle:{
@@ -542,13 +605,20 @@ function apply(key){
   arrKey=key;
   const a=ARR[key];if(!a)return;
   const pos=a.fn();
-  const isPath=PATH_KEYS.has(key),isGrid=GRID_KEYS.has(key),isML=ML_KEYS.has(key);
-  document.getElementById('rrow').style.display    =isPath?'':'none';
-  document.getElementById('gcrow').style.display   =isGrid?'':'none';
-  document.getElementById('ml-opts').style.display =isML?'':'none';
-  document.getElementById('ml-div').style.display  =isML?'':'none';
-  document.getElementById('path-opts').style.display=isPath?'':'none';
-  document.getElementById('path-div').style.display =isPath?'':'none';
+  const isSq=key==='squarePerim';
+  const isPath=PATH_KEYS.has(key)||isSq,isGrid=GRID_KEYS.has(key),isML=ML_KEYS.has(key)||isSq;
+  const show=id=>document.getElementById(id).style.display='flex';
+  const hide=id=>document.getElementById(id).style.display='none';
+  isPath  ? show('rrow')      : hide('rrow');
+  isGrid  ? show('gcrow')     : hide('gcrow');
+  isML    ? show('ml-opts')   : hide('ml-opts');
+  const showDiv=id=>document.getElementById(id).style.display='block';
+  isML    ? showDiv('ml-div')  : hide('ml-div');
+  isSq    ? show('sq-opts')   : hide('sq-opts');
+  isSq    ? showDiv('sq-div') : hide('sq-div');
+  isPath  ? show('path-opts') : hide('path-opts');
+  isPath  ? showDiv('path-div'): hide('path-div');
+  document.getElementById('rrow-lbl').textContent=isSq?'Row gap':'Radius';
   letters.forEach((l,i)=>l.goto(pos[i].x,pos[i].y,pos[i].r,i*.038+Math.random()*.018));
   document.querySelectorAll('.arr-btn').forEach(b=>b.classList.toggle('active',b.dataset.key===key));
 }
@@ -585,45 +655,46 @@ function setSlider(id,vid,val){
 }
 function flowStep(){
   flowCycleCount++;
-  // Every cycle: tension + spacing + justify
+
+  // Pick next arrangement first — arrangement-specific params are
+  // only randomised when the incoming arrangement actually uses them.
+  const keys=Object.keys(ARR).filter(k=>k!==arrKey);
+  const nextKey=keys[Math.floor(Math.random()*keys.length)];
+  const isPath=PATH_KEYS.has(nextKey);
+  const isGrid=GRID_KEYS.has(nextKey);
+  const isML  =ML_KEYS.has(nextKey);
+
+  // Every cycle: tension
   P.ten=Math.round(3+Math.random()*14);
   setSlider('r3','v3',P.ten);
-  P.sp=Math.round(Math.random()*120);
-  setSlider('r0','v0',P.sp);
-  justify=Math.random()>0.5;
-  document.getElementById('btn-justify').textContent=justify?'Justified':'Justify';
-  document.getElementById('btn-justify').classList.toggle('on',justify);
-  // Every 2 cycles: speed + stagger
+
+  // Every 2 cycles: speed + spacing
   if(flowCycleCount%2===0){
     P.spd=Math.round(4+Math.random()*13);
     setSlider('r2','v2',P.spd);
-    P.stagger=Math.round((Math.random()*2-1)*180);
-    setSlider('rs','vs',P.stagger);
+    P.sp=Math.round(Math.random()*110);
+    setSlider('r0','v0',P.sp);
   }
-  // Every 3 cycles: radius + columns
+
+  // Every 3 cycles: justify toggle
   if(flowCycleCount%3===0){
-    P.rad=Math.round(80+Math.random()*320);
-    setSlider('r4','v4',P.rad);
-    P.cols=Math.round(2+Math.random()*6);
-    setSlider('r5','v5',P.cols);
+    justify=Math.random()>0.5;
+    document.getElementById('btn-justify').textContent=justify?'Justified':'Justify';
+    document.getElementById('btn-justify').classList.toggle('on',justify);
   }
-  // Every 4 cycles: stagger alt mode
-  if(flowCycleCount%4===0){
-    staggerAlt=Math.random()>0.5;
-    const bs=document.getElementById('btn-stagger-alt');
-    bs.textContent=staggerAlt?'Alt on':'Alt stagger';
-    bs.classList.toggle('on',staggerAlt);
-  }
+
   // Every 5 cycles: size
   if(flowCycleCount%5===0){
     P.sz=Math.round(48+Math.random()*88);
     setSlider('r1','v1',P.sz);
   }
+
   // Every 6 cycles: layout rotation
   if(flowCycleCount%6===0){
     layoutRot=Math.floor(Math.random()*4);
     updateRotBtn();
   }
+
   // Every 7 cycles: upright
   if(flowCycleCount%7===0){
     pathUpright=Math.random()>0.5;
@@ -631,9 +702,29 @@ function flowStep(){
     bu.textContent=pathUpright?'Upright on':'Upright off';
     bu.classList.toggle('on',pathUpright);
   }
-  // Pick and apply a random different arrangement
-  const keys=Object.keys(ARR).filter(k=>k!==arrKey);
-  apply(keys[Math.floor(Math.random()*keys.length)]);
+
+  // Arrangement-specific: only randomise params relevant to what's coming
+  if(isPath){
+    // Radius for circle / square / orbit
+    P.rad=Math.round(80+Math.random()*320);
+    setSlider('r4','v4',P.rad);
+  }
+  if(isGrid){
+    // Columns for grid
+    P.cols=Math.round(2+Math.random()*7);
+    setSlider('r5','v5',P.cols);
+  }
+  if(isML){
+    // Stagger amount + alt mode for multi-line arrangements
+    P.stagger=Math.round((Math.random()*2-1)*180);
+    setSlider('rs','vs',P.stagger);
+    staggerAlt=Math.random()>0.5;
+    const bs=document.getElementById('btn-stagger-alt');
+    bs.textContent=staggerAlt?'Alt on':'Alt stagger';
+    bs.classList.toggle('on',staggerAlt);
+  }
+
+  apply(nextKey);
 }
 
 // ── Mouse forces ───────────────────────────────────────────────
@@ -672,7 +763,7 @@ function loop(ts){
   const dt=Math.min((ts-last)/1000,.05);last=ts;gNow=ts/1000;
   letters.forEach(l=>l.update(dt));
   forces();
-if(flowMode){flowTimer+=dt;if(flowTimer>=aliveInterval){flowTimer=0;flowStep();}}
+  if(flowMode){flowTimer+=dt;if(flowTimer>=aliveInterval){flowTimer=0;flowStep();}}
   if(pulseMode){pulseTimer+=dt;if(pulseTimer>=aliveInterval){pulseTimer=0;wordPulse();}}
   render();
   requestAnimationFrame(loop);
@@ -681,13 +772,15 @@ if(flowMode){flowTimer+=dt;if(flowTimer>=aliveInterval){flowTimer=0;flowStep();}
 // ── Scenes ─────────────────────────────────────────────────────
 function saveScene(){
   const name=prompt('Name:',`Scene ${scenes.length+1}`);if(!name)return;
-  scenes.push({id:Date.now(),name,key:arrKey,bg,p:{...P},rot:layoutRot,
+  const fontKey=Object.keys(FONTS).find(k=>FONTS[k]===currentFont)||'helvetica';
+  scenes.push({id:Date.now(),name,key:arrKey,bg,p:{...P},rot:layoutRot,font:fontKey,
     pos:letters.map(l=>({x:l.x,y:l.y,r:l.rot,pin:l.pinned}))});
   try{localStorage.setItem('tf6-scenes',JSON.stringify(scenes));}catch(e){}
   renderScenes();
 }
 function loadScene(s){
   arrKey=s.key;bg=s.bg;Object.assign(P,s.p);layoutRot=s.rot||0;
+  if(s.font&&FONTS[s.font]){currentFont=FONTS[s.font];document.getElementById('font-select').value=s.font;}
   syncSliders();setBg(s.bg);updateRotBtn();
   s.pos.forEach((p,i)=>{if(letters[i]){letters[i].pinned=p.pin;letters[i].goto(p.x,p.y,p.r,i*.04);}});
   document.querySelectorAll('.arr-btn').forEach(b=>b.classList.toggle('active',b.dataset.key===s.key));
@@ -793,6 +886,14 @@ window.addEventListener('load',()=>{
     layoutRot=(layoutRot+1)%4;updateRotBtn();apply(arrKey);
   });
 
+  // Square split presets — Auto (-1) hands control back to the sliders
+  document.querySelectorAll('.sq-split').forEach(b=>{
+    b.addEventListener('click',()=>{
+      squareSplit=+b.dataset.split; // -1 = auto, 0–3 = manual lock
+      apply('squarePerim');          // squarePerimFn syncs the button highlights
+    });
+  });
+
   // Upright (path arrangements)
   document.getElementById('btn-upright').addEventListener('click',e=>{
     pathUpright=!pathUpright;
@@ -860,6 +961,16 @@ window.addEventListener('load',()=>{
     const keys=Object.keys(ARR);
     if(e.key>='1'&&e.key<='8')apply(keys[+e.key-1]||arrKey);
   });
+
+  // Font selector (dropdown)
+  const fontSel=document.getElementById('font-select');
+  Object.entries(FONTS).forEach(([key,f])=>{
+    const o=document.createElement('option');
+    o.value=key;o.textContent=f.label;
+    fontSel.appendChild(o);
+  });
+  fontSel.value='helvetica';
+  fontSel.addEventListener('change',()=>{currentFont=FONTS[fontSel.value];apply(arrKey);});
 
   renderScenes();
   setTimeout(()=>apply('twoLine'),400);
