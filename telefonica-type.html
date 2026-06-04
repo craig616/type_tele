@@ -114,8 +114,7 @@ body.on-dark #hint{color:rgba(255,255,255,.14)}
     <div><div class="lbl">Size <em id="v1">80</em></div><input type="range" id="r1" min="20" max="160" value="80"></div>
     <div><div class="lbl">Speed <em id="v2">8</em></div><input type="range" id="r2" min="1" max="20" value="8"></div>
     <div><div class="lbl">Tension <em id="v3">6</em></div><input type="range" id="r3" min="1" max="20" value="6"></div>
-    <div id="rrow" style="display:none"><div class="lbl"><span id="rrow-lbl">Radius</span> <em id="v4">180</em></div><input type="range" id="r4" min="60" max="500" value="180"></div>
-    <div id="gcrow" style="display:none"><div class="lbl">Columns <em id="v5">4</em></div><input type="range" id="r5" min="1" max="10" value="4"></div>
+    <div id="rrow" style="visibility:hidden"><div class="lbl"><span id="rrow-lbl">Radius</span><em id="v4">180</em></div><input type="range" id="r4" min="60" max="500" value="180"></div>
   </div>
   <div class="div"></div>
   <!-- Multi-line controls: justify + stagger -->
@@ -609,8 +608,19 @@ function apply(key){
   const isPath=PATH_KEYS.has(key)||isSq,isGrid=GRID_KEYS.has(key),isML=ML_KEYS.has(key)||isSq;
   const show=id=>document.getElementById(id).style.display='flex';
   const hide=id=>document.getElementById(id).style.display='none';
-  isPath  ? show('rrow')      : hide('rrow');
-  isGrid  ? show('gcrow')     : hide('gcrow');
+  // 5th slider row: always in layout (visibility), repurposed for radius or cols
+  const r4el=document.getElementById('r4'),v4el=document.getElementById('v4');
+  if(isGrid){
+    document.getElementById('rrow').style.visibility='visible';
+    document.getElementById('rrow-lbl').textContent='Cols';
+    r4el.min=1;r4el.max=10;r4el.value=P.cols;v4el.textContent=P.cols;
+  }else if(isPath){
+    document.getElementById('rrow').style.visibility='visible';
+    document.getElementById('rrow-lbl').textContent=isSq?'Row gap':'Radius';
+    r4el.min=60;r4el.max=500;r4el.value=P.rad;v4el.textContent=P.rad;
+  }else{
+    document.getElementById('rrow').style.visibility='hidden';
+  }
   isML    ? show('ml-opts')   : hide('ml-opts');
   const showDiv=id=>document.getElementById(id).style.display='block';
   isML    ? showDiv('ml-div')  : hide('ml-div');
@@ -618,7 +628,6 @@ function apply(key){
   isSq    ? showDiv('sq-div') : hide('sq-div');
   isPath  ? show('path-opts') : hide('path-opts');
   isPath  ? showDiv('path-div'): hide('path-div');
-  document.getElementById('rrow-lbl').textContent=isSq?'Row gap':'Radius';
   letters.forEach((l,i)=>l.goto(pos[i].x,pos[i].y,pos[i].r,i*.038+Math.random()*.018));
   document.querySelectorAll('.arr-btn').forEach(b=>b.classList.toggle('active',b.dataset.key===key));
 }
@@ -805,9 +814,12 @@ function setBg(key){
   document.body.style.background=key==='clear'?'repeating-conic-gradient(#bbb 0% 25%,#ddd 0% 50%) 0 0/14px 14px':'';
 }
 function syncSliders(){
-  [['r0','v0','sp'],['r1','v1','sz'],['r2','v2','spd'],['r3','v3','ten'],['r4','v4','rad'],['r5','v5','cols']].forEach(([r,v,k])=>{
+  [['r0','v0','sp'],['r1','v1','sz'],['r2','v2','spd'],['r3','v3','ten']].forEach(([r,v,k])=>{
     document.getElementById(r).value=P[k];document.getElementById(v).textContent=P[k];
   });
+  // r4 is contextual — sync whichever param is active
+  const r4val=GRID_KEYS.has(arrKey)?P.cols:P.rad;
+  document.getElementById('r4').value=r4val;document.getElementById('v4').textContent=r4val;
   document.getElementById('rs').value=P.stagger;document.getElementById('vs').textContent=P.stagger;
 }
 function updateRotBtn(){
@@ -835,11 +847,17 @@ window.addEventListener('load',()=>{
   });
 
   // Sliders
-  [['r0','v0','sp'],['r1','v1','sz'],['r2','v2','spd'],['r3','v3','ten'],['r4','v4','rad'],['r5','v5','cols']].forEach(([rid,vid,pk])=>{
+  [['r0','v0','sp'],['r1','v1','sz'],['r2','v2','spd'],['r3','v3','ten']].forEach(([rid,vid,pk])=>{
     document.getElementById(rid).addEventListener('input',e=>{
       P[pk]=+e.target.value;document.getElementById(vid).textContent=P[pk];
-      if(['sp','sz','rad','cols'].includes(pk))apply(arrKey);
+      if(['sp','sz'].includes(pk))apply(arrKey);
     });
+  });
+  // r4 is repurposed: radius for path/frame, cols for grid
+  document.getElementById('r4').addEventListener('input',e=>{
+    if(GRID_KEYS.has(arrKey)){P.cols=+e.target.value;}else{P.rad=+e.target.value;}
+    document.getElementById('v4').textContent=+e.target.value;
+    apply(arrKey);
   });
   document.getElementById('rs').addEventListener('input',e=>{
     P.stagger=+e.target.value;document.getElementById('vs').textContent=P.stagger;apply(arrKey);
